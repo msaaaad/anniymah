@@ -14,6 +14,9 @@ export interface LandingPageFormValues {
   part2Title: string;
   part2Text: string;
   part2ImageUrl: string;
+  freeDelivery: boolean;
+  deliveryChargeInsideDhaka: number;
+  deliveryChargeOutsideDhaka: number;
 }
 
 interface LandingPageFormProps {
@@ -125,6 +128,44 @@ export function LandingPageForm({ initial, submitLabel, onSubmit, headerActions 
             onChange={(url) => update("imageUrl", url)}
           />
         </div>
+      </section>
+
+      <section className="mt-6 rounded-[10px] border border-border bg-surface p-4 sm:p-6">
+        <h2 className="font-heading text-lg font-semibold">Delivery</h2>
+
+        <label className="mt-4 flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={values.freeDelivery}
+            onChange={(e) => update("freeDelivery", e.target.checked)}
+          />
+          Free delivery
+        </label>
+
+        {!values.freeDelivery && (
+          <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[13px] text-muted">Charge — Inside Dhaka (৳)</label>
+              <input
+                type="number"
+                min={0}
+                value={values.deliveryChargeInsideDhaka}
+                onChange={(e) => update("deliveryChargeInsideDhaka", Number(e.target.value))}
+                className="rounded-[8px] border border-border bg-surface px-3.5 py-3 focus:border-sage focus:outline-none"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[13px] text-muted">Charge — Outside Dhaka (৳)</label>
+              <input
+                type="number"
+                min={0}
+                value={values.deliveryChargeOutsideDhaka}
+                onChange={(e) => update("deliveryChargeOutsideDhaka", Number(e.target.value))}
+                className="rounded-[8px] border border-border bg-surface px-3.5 py-3 focus:border-sage focus:outline-none"
+              />
+            </div>
+          </div>
+        )}
       </section>
 
       <section className="mt-6 rounded-[10px] border border-border bg-surface p-4 sm:p-6">

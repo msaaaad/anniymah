@@ -1,6 +1,12 @@
 import { getSupabaseAdmin } from "@/lib/supabase";
 import { deleteStorageImageIfOwned } from "@/lib/storage";
-import { MAX_LANDING_PAGES, type LandingPage, type Order, type OrderStatus } from "@/lib/types";
+import {
+  MAX_LANDING_PAGES,
+  type DeliveryZone,
+  type LandingPage,
+  type Order,
+  type OrderStatus,
+} from "@/lib/types";
 
 export class LandingPageLimitError extends Error {
   constructor() {
@@ -21,6 +27,9 @@ interface LandingPageRow {
   part2_title: string;
   part2_text: string;
   part2_image_url: string;
+  free_delivery: boolean;
+  delivery_charge_inside_dhaka: number;
+  delivery_charge_outside_dhaka: number;
   created_at: string;
   updated_at: string;
 }
@@ -33,6 +42,8 @@ interface OrderRow {
   address: string;
   quantity: number;
   unit_price: number;
+  delivery_zone: DeliveryZone | null;
+  delivery_charge: number;
   total: number;
   notes: string;
   status: OrderStatus;
@@ -54,6 +65,9 @@ function toLandingPage(row: LandingPageRow): LandingPage {
     part2Title: row.part2_title,
     part2Text: row.part2_text,
     part2ImageUrl: row.part2_image_url,
+    freeDelivery: row.free_delivery,
+    deliveryChargeInsideDhaka: row.delivery_charge_inside_dhaka,
+    deliveryChargeOutsideDhaka: row.delivery_charge_outside_dhaka,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -70,6 +84,8 @@ function toOrder(row: OrderRow): Order {
     address: row.address,
     quantity: row.quantity,
     unitPrice: row.unit_price,
+    deliveryZone: row.delivery_zone,
+    deliveryCharge: row.delivery_charge,
     total: row.total,
     notes: row.notes,
     status: row.status,
@@ -121,6 +137,13 @@ function toRowPatch(patch: Partial<LandingPageInput>) {
     ...(patch.part2Title !== undefined && { part2_title: patch.part2Title }),
     ...(patch.part2Text !== undefined && { part2_text: patch.part2Text }),
     ...(patch.part2ImageUrl !== undefined && { part2_image_url: patch.part2ImageUrl }),
+    ...(patch.freeDelivery !== undefined && { free_delivery: patch.freeDelivery }),
+    ...(patch.deliveryChargeInsideDhaka !== undefined && {
+      delivery_charge_inside_dhaka: patch.deliveryChargeInsideDhaka,
+    }),
+    ...(patch.deliveryChargeOutsideDhaka !== undefined && {
+      delivery_charge_outside_dhaka: patch.deliveryChargeOutsideDhaka,
+    }),
   };
 }
 
@@ -145,6 +168,9 @@ export async function createLandingPage(input: LandingPageInput): Promise<Landin
       part2_title: input.part2Title,
       part2_text: input.part2Text,
       part2_image_url: input.part2ImageUrl,
+      free_delivery: input.freeDelivery,
+      delivery_charge_inside_dhaka: input.deliveryChargeInsideDhaka,
+      delivery_charge_outside_dhaka: input.deliveryChargeOutsideDhaka,
     })
     .select()
     .single();
@@ -206,10 +232,24 @@ export async function listOrders(): Promise<Order[]> {
 export async function createOrder(
   input: Pick<Order, "customerName" | "phone" | "address" | "quantity" | "notes"> & {
     landingPageId: string;
+    deliveryZone: DeliveryZone | null;
   }
 ): Promise<Order> {
   const page = await getLandingPageById(input.landingPageId);
   if (!page) throw new Error("Landing page not found");
+
+  // The delivery charge is always derived from the page's current settings
+  // server-side, never trusted from the client — same principle as unitPrice.
+  let deliveryZone: DeliveryZone | null = null;
+  let deliveryCharge = 0;
+  if (!page.freeDelivery) {
+    if (input.deliveryZone !== "inside_dhaka" && input.deliveryZone !== "outside_dhaka") {
+      throw new Error("Please select a delivery area");
+    }
+    deliveryZone = input.deliveryZone;
+    deliveryCharge =
+      deliveryZone === "inside_dhaka" ? page.deliveryChargeInsideDhaka : page.deliveryChargeOutsideDhaka;
+  }
 
   const unitPrice = page.price;
   const { data, error } = await getSupabaseAdmin()
@@ -221,7 +261,9 @@ export async function createOrder(
       address: input.address,
       quantity: input.quantity,
       unit_price: unitPrice,
-      total: unitPrice * input.quantity,
+      delivery_zone: deliveryZone,
+      delivery_charge: deliveryCharge,
+      total: unitPrice * input.quantity + deliveryCharge,
       notes: input.notes,
       status: "pending",
     })

@@ -14,6 +14,9 @@ const EMPTY: LandingPageFormValues = {
   part2Title: "",
   part2Text: "",
   part2ImageUrl: "",
+  freeDelivery: true,
+  deliveryChargeInsideDhaka: 0,
+  deliveryChargeOutsideDhaka: 0,
 };
 
 export default function NewLandingPage() {

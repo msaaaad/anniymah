@@ -125,6 +125,26 @@ input, select, textarea { font-size: 15px; }
 .qty-stepper input::-webkit-outer-spin-button,
 .qty-stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
 
+.delivery-options { display: flex; flex-direction: column; gap: 8px; }
+/* `.field label { display: block }` outranks a plain `.delivery-option` class
+   selector on specificity alone (0,0,1,1 beats 0,0,1,0), so this must match
+   as `label.delivery-option` to win and keep the row flex-laid-out. */
+label.delivery-option {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px;
+  font-size: 14px; color: var(--text); cursor: pointer; margin-bottom: 0;
+  transition: border-color .15s ease, background .15s ease;
+}
+.delivery-option.active { border-color: var(--sage); background: var(--sage-tint); }
+/* Reset the `.field input { width:100%; padding; border }` rule, which also
+   matches this radio since it lives inside a `.field.full` wrapper and would
+   otherwise stretch its layout box and squeeze the label text onto its own line. */
+.delivery-option input {
+  width: auto; padding: 0; border: none; border-radius: 0; background: transparent;
+  accent-color: var(--sage); flex-shrink: 0;
+}
+.delivery-option .charge { font-weight: 600; color: var(--sage-dark); white-space: nowrap; }
+
 .order-summary { background: var(--sage-tint); border-radius: 12px; padding: 22px; }
 .order-summary h4 { font-size: 15px; margin-bottom: 14px; font-family: var(--font-heading), serif; }
 .order-summary .row { display: flex; justify-content: space-between; font-size: 14px; padding: 6px 0; color: var(--text); }

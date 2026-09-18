@@ -1,6 +1,6 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { env } from "@/lib/env";
-import type { OrderStatus } from "@/lib/types";
+import type { DeliveryZone, OrderStatus } from "@/lib/types";
 
 // These must be `type` aliases, not `interface` — postgrest-js's generic
 // inference for .insert()/.update() silently collapses to `never` when an
@@ -19,6 +19,9 @@ type LandingPageRow = {
   part2_title: string;
   part2_text: string;
   part2_image_url: string;
+  free_delivery: boolean;
+  delivery_charge_inside_dhaka: number;
+  delivery_charge_outside_dhaka: number;
   created_at: string;
   updated_at: string;
 };
@@ -31,6 +34,8 @@ type OrderRow = {
   address: string;
   quantity: number;
   unit_price: number;
+  delivery_zone: DeliveryZone | null;
+  delivery_charge: number;
   total: number;
   notes: string;
   status: OrderStatus;

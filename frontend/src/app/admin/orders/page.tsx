@@ -90,6 +90,14 @@ export default function AdminOrdersPage() {
                         <dt className="text-muted">Quantity</dt>
                         <dd>{order.quantity} × ৳{order.unitPrice}</dd>
                       </div>
+                      <div>
+                        <dt className="text-muted">Delivery</dt>
+                        <dd>
+                          {order.deliveryZone
+                            ? `${order.deliveryZone === "inside_dhaka" ? "Inside Dhaka" : "Outside Dhaka"} · ৳${order.deliveryCharge}`
+                            : "Free"}
+                        </dd>
+                      </div>
                       {order.notes && (
                         <div className="sm:col-span-2">
                           <dt className="text-muted">Notes</dt>

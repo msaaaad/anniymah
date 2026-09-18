@@ -22,6 +22,9 @@ create table landing_pages (
   part2_title text not null default '',
   part2_text text not null default '',
   part2_image_url text not null default '',
+  free_delivery boolean not null default true,
+  delivery_charge_inside_dhaka integer not null default 0,
+  delivery_charge_outside_dhaka integer not null default 0,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -59,6 +62,8 @@ create table orders (
   address text not null,
   quantity integer not null check (quantity > 0 and quantity <= 20),
   unit_price integer not null,
+  delivery_zone text check (delivery_zone is null or delivery_zone in ('inside_dhaka', 'outside_dhaka')),
+  delivery_charge integer not null default 0,
   total integer not null,
   notes text not null default '',
   status text not null default 'pending' check (status in ('pending', 'confirmed', 'delivered', 'cancelled', 'rejected')),

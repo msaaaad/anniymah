@@ -30,6 +30,10 @@ export async function POST(request: NextRequest) {
   const address = typeof body.address === "string" ? body.address.trim() : "";
   const quantity = Number(body.quantity) || 1;
   const notes = typeof body.notes === "string" ? body.notes.trim() : "";
+  const deliveryZone =
+    body.deliveryZone === "inside_dhaka" || body.deliveryZone === "outside_dhaka"
+      ? body.deliveryZone
+      : null;
 
   if (!landingPageId) {
     return NextResponse.json({ error: "Missing landing page" }, { status: 400 });
@@ -58,9 +62,11 @@ export async function POST(request: NextRequest) {
       address,
       quantity,
       notes,
+      deliveryZone,
     });
     return NextResponse.json(order, { status: 201 });
-  } catch {
-    return NextResponse.json({ error: "Landing page not found" }, { status: 400 });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "Failed to create order";
+    return NextResponse.json({ error: message }, { status: 400 });
   }
 }

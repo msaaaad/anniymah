@@ -108,7 +108,13 @@ export default async function LandingPageBySlug({
           <p style={{ color: "var(--muted)", fontSize: 14.5, marginBottom: 24, maxWidth: 520 }}>
             নিচের ফর্মটি পূরণ করে Confirm করুন — আপনার অর্ডারটি সরাসরি আমাদের কাছে চলে যাবে। ক্যাশ অন ডেলিভারিতে পেমেন্ট করবেন।
           </p>
-          <OrderForm landingPageId={landing.id} price={landing.price} />
+          <OrderForm
+            landingPageId={landing.id}
+            price={landing.price}
+            freeDelivery={landing.freeDelivery}
+            deliveryChargeInsideDhaka={landing.deliveryChargeInsideDhaka}
+            deliveryChargeOutsideDhaka={landing.deliveryChargeOutsideDhaka}
+          />
         </section>
       </main>
 

@@ -39,6 +39,9 @@ export async function POST(request: NextRequest) {
       part2Title: String(body.part2Title ?? ""),
       part2Text: String(body.part2Text ?? ""),
       part2ImageUrl: String(body.part2ImageUrl ?? ""),
+      freeDelivery: body.freeDelivery !== false,
+      deliveryChargeInsideDhaka: Math.max(0, Number(body.deliveryChargeInsideDhaka) || 0),
+      deliveryChargeOutsideDhaka: Math.max(0, Number(body.deliveryChargeOutsideDhaka) || 0),
     });
     return NextResponse.json(page, { status: 201 });
   } catch (err) {

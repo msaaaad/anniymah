@@ -54,6 +54,9 @@ export async function PUT(
       part2Title: String(body.part2Title ?? ""),
       part2Text: String(body.part2Text ?? ""),
       part2ImageUrl: String(body.part2ImageUrl ?? ""),
+      freeDelivery: body.freeDelivery !== false,
+      deliveryChargeInsideDhaka: Math.max(0, Number(body.deliveryChargeInsideDhaka) || 0),
+      deliveryChargeOutsideDhaka: Math.max(0, Number(body.deliveryChargeOutsideDhaka) || 0),
     });
     if (!page) return NextResponse.json({ error: "Not found" }, { status: 404 });
     return NextResponse.json(page);

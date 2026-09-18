@@ -65,6 +65,9 @@ export default function EditLandingPage({ params }: { params: Promise<{ id: stri
             part2Title: page.part2Title,
             part2Text: page.part2Text,
             part2ImageUrl: page.part2ImageUrl,
+            freeDelivery: page.freeDelivery,
+            deliveryChargeInsideDhaka: page.deliveryChargeInsideDhaka,
+            deliveryChargeOutsideDhaka: page.deliveryChargeOutsideDhaka,
           }}
           submitLabel="Save changes"
           onSubmit={handleSubmit}

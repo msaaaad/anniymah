@@ -1,4 +1,5 @@
 export type OrderStatus = "pending" | "confirmed" | "delivered" | "cancelled" | "rejected";
+export type DeliveryZone = "inside_dhaka" | "outside_dhaka";
 
 export const MAX_LANDING_PAGES = 4;
 
@@ -14,6 +15,9 @@ export interface LandingPage {
   part2Title: string;
   part2Text: string;
   part2ImageUrl: string;
+  freeDelivery: boolean;
+  deliveryChargeInsideDhaka: number;
+  deliveryChargeOutsideDhaka: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -27,6 +31,8 @@ export interface Order {
   address: string;
   quantity: number;
   unitPrice: number;
+  deliveryZone: DeliveryZone | null;
+  deliveryCharge: number;
   total: number;
   notes: string;
   status: OrderStatus;

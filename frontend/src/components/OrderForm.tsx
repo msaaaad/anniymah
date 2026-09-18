@@ -2,21 +2,37 @@
 
 import { FormEvent, useState } from "react";
 import { isValidBangladeshiPhone } from "@/lib/phone";
+import type { DeliveryZone } from "@/lib/types";
 
 interface OrderFormProps {
   landingPageId: string;
   price: number;
+  freeDelivery: boolean;
+  deliveryChargeInsideDhaka: number;
+  deliveryChargeOutsideDhaka: number;
 }
 
 type SubmitState = "idle" | "submitting" | "success" | "error";
 
-export function OrderForm({ landingPageId, price }: OrderFormProps) {
+export function OrderForm({
+  landingPageId,
+  price,
+  freeDelivery,
+  deliveryChargeInsideDhaka,
+  deliveryChargeOutsideDhaka,
+}: OrderFormProps) {
   const [quantity, setQuantity] = useState(1);
+  const [deliveryZone, setDeliveryZone] = useState<DeliveryZone>("inside_dhaka");
   const [state, setState] = useState<SubmitState>("idle");
   const [message, setMessage] = useState("");
   const [phoneError, setPhoneError] = useState("");
 
-  const total = price * quantity;
+  const deliveryCharge = freeDelivery
+    ? 0
+    : deliveryZone === "inside_dhaka"
+      ? deliveryChargeInsideDhaka
+      : deliveryChargeOutsideDhaka;
+  const total = price * quantity + deliveryCharge;
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -38,6 +54,7 @@ export function OrderForm({ landingPageId, price }: OrderFormProps) {
       phone,
       address: formData.get("address"),
       quantity,
+      deliveryZone: freeDelivery ? null : deliveryZone,
       notes: formData.get("notes"),
       company: formData.get("company"), // honeypot
     };
@@ -100,6 +117,37 @@ export function OrderForm({ landingPageId, price }: OrderFormProps) {
               <label htmlFor="address">Delivery address</label>
               <input id="address" name="address" placeholder="বাসা, রোড, এলাকা — শহর" required />
             </div>
+            {!freeDelivery && (
+              <div className="field full">
+                <label>Delivery area</label>
+                <div className="delivery-options">
+                  <label className={`delivery-option${deliveryZone === "inside_dhaka" ? " active" : ""}`}>
+                    <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <input
+                        type="radio"
+                        name="deliveryZoneChoice"
+                        checked={deliveryZone === "inside_dhaka"}
+                        onChange={() => setDeliveryZone("inside_dhaka")}
+                      />
+                      ঢাকার ভিতরে
+                    </span>
+                    <span className="charge">৳{deliveryChargeInsideDhaka}</span>
+                  </label>
+                  <label className={`delivery-option${deliveryZone === "outside_dhaka" ? " active" : ""}`}>
+                    <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                      <input
+                        type="radio"
+                        name="deliveryZoneChoice"
+                        checked={deliveryZone === "outside_dhaka"}
+                        onChange={() => setDeliveryZone("outside_dhaka")}
+                      />
+                      ঢাকার বাইরে
+                    </span>
+                    <span className="charge">৳{deliveryChargeOutsideDhaka}</span>
+                  </label>
+                </div>
+              </div>
+            )}
             <div className="field">
               <label htmlFor="quantity">Quantity</label>
               <div className="qty-stepper">
@@ -145,7 +193,11 @@ export function OrderForm({ landingPageId, price }: OrderFormProps) {
           </div>
           <div className="row">
             <span>Delivery</span>
-            <span style={{ color: "var(--sage-dark)", fontWeight: 600 }}>Free</span>
+            {freeDelivery ? (
+              <span style={{ color: "var(--sage-dark)", fontWeight: 600 }}>Free</span>
+            ) : (
+              <span><span className="tk">৳</span>{deliveryCharge}</span>
+            )}
           </div>
           <div className="row total">
             <span>Total</span>
@@ -155,7 +207,10 @@ export function OrderForm({ landingPageId, price }: OrderFormProps) {
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
               <path d="M9 12l2 2 4-4m5 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
             </svg>
-            <span>ডেলিভারি সম্পূর্ণ ফ্রি — Confirm করলেই আপনার অর্ডার আমাদের কাছে পৌঁছে যাবে।</span>
+            <span>
+              {freeDelivery && "ডেলিভারি সম্পূর্ণ ফ্রি — "}
+              Confirm করলেই আপনার অর্ডার আমাদের কাছে পৌঁছে যাবে।
+            </span>
           </div>
 
           {(state === "success" || state === "error") && (

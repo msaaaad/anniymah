@@ -63,9 +63,9 @@ export default function AdminOrdersPage() {
                 <button
                   type="button"
                   onClick={() => setOpenId(isOpen ? null : order.id)}
-                  className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left"
+                  className="flex w-full flex-col items-start gap-2 px-5 py-4 text-left sm:flex-row sm:items-center sm:justify-between sm:gap-4"
                 >
-                  <div>
+                  <div className="min-w-0">
                     <p className="font-medium">{order.customerName}</p>
                     <p className="text-sm text-muted">
                       {order.phone} · ৳{order.total} · {new Date(order.createdAt).toLocaleString()}

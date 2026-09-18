@@ -33,7 +33,7 @@ export default function AdminPagesList() {
 
   return (
     <div>
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="font-heading text-2xl font-semibold">Landing Pages</h1>
           <p className="mt-1 text-sm text-muted">
@@ -47,7 +47,7 @@ export default function AdminPagesList() {
         ) : (
           <Link
             href="/admin/pages/new"
-            className="rounded-[8px] bg-sage px-[26px] py-[13px] font-medium text-white transition-colors hover:bg-sage-dark"
+            className="rounded-[8px] bg-sage px-[26px] py-[13px] text-center font-medium text-white transition-colors hover:bg-sage-dark"
           >
             Create new page
           </Link>
@@ -58,44 +58,48 @@ export default function AdminPagesList() {
         {pages.map((page) => (
           <div
             key={page.id}
-            className="flex items-center gap-4 rounded-[10px] border border-border bg-surface p-4"
+            className="flex flex-col gap-4 rounded-[10px] border border-border bg-surface p-4 sm:flex-row sm:items-center"
           >
-            <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-media-bg">
-              {page.imageUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element -- admin thumbnail preview, small local/CDN image
-                <img src={page.imageUrl} alt="" className="h-full w-full object-cover" />
-              ) : (
-                <span className="text-[10px] text-muted">No image</span>
-              )}
+            <div className="flex items-center gap-4">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-media-bg">
+                {page.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- admin thumbnail preview, small local/CDN image
+                  <img src={page.imageUrl} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <span className="text-[10px] text-muted">No image</span>
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="truncate font-medium">{page.title || "(untitled)"}</p>
+                <p className="text-sm text-muted">
+                  /p/{page.slug} · ৳{page.price}
+                </p>
+              </div>
             </div>
-            <div className="flex-1">
-              <p className="font-medium">{page.title || "(untitled)"}</p>
-              <p className="text-sm text-muted">
-                /p/{page.slug} · ৳{page.price}
-              </p>
+            <div className="flex flex-wrap gap-2 sm:shrink-0">
+              <a
+                href={`/p/${page.slug}`}
+                target="_blank"
+                rel="noreferrer"
+                className="rounded-[8px] border border-border px-4 py-2 text-sm hover:border-sage-dark hover:text-sage-dark"
+              >
+                View live
+              </a>
+              <Link
+                href={`/admin/pages/${page.id}/edit`}
+                className="rounded-[8px] border border-border px-4 py-2 text-sm hover:border-sage-dark hover:text-sage-dark"
+              >
+                Edit
+              </Link>
+              <button
+                type="button"
+                onClick={() => handleDelete(page.id, page.title)}
+                disabled={deletingId === page.id}
+                className="rounded-[8px] border border-border px-4 py-2 text-sm text-muted hover:border-rose-dark hover:text-rose-dark disabled:opacity-50"
+              >
+                Delete
+              </button>
             </div>
-            <a
-              href={`/p/${page.slug}`}
-              target="_blank"
-              rel="noreferrer"
-              className="rounded-[8px] border border-border px-4 py-2 text-sm hover:border-sage-dark hover:text-sage-dark"
-            >
-              View live
-            </a>
-            <Link
-              href={`/admin/pages/${page.id}/edit`}
-              className="rounded-[8px] border border-border px-4 py-2 text-sm hover:border-sage-dark hover:text-sage-dark"
-            >
-              Edit
-            </Link>
-            <button
-              type="button"
-              onClick={() => handleDelete(page.id, page.title)}
-              disabled={deletingId === page.id}
-              className="rounded-[8px] border border-border px-4 py-2 text-sm text-muted hover:border-rose-dark hover:text-rose-dark disabled:opacity-50"
-            >
-              Delete
-            </button>
           </div>
         ))}
       </div>

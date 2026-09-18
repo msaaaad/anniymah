@@ -61,7 +61,7 @@ export function ImageUploader({ label, value, onChange }: ImageUploaderProps) {
     <div className="flex flex-col gap-1.5">
       <label className="text-[13px] text-muted">{label}</label>
 
-      <div className="flex items-center gap-4">
+      <div className="flex flex-wrap items-center gap-4">
         <div className="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border bg-media-bg">
           {value ? (
             // eslint-disable-next-line @next/next/no-img-element -- local upload path, not worth next/image config for an MVP

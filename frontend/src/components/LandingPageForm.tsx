@@ -51,12 +51,11 @@ export function LandingPageForm({ initial, submitLabel, onSubmit, headerActions 
 
   return (
     <form onSubmit={handleSubmit} className="max-w-2xl">
-      <div className="flex items-center justify-between">
-        <div />
-        {headerActions}
-      </div>
+      {headerActions && (
+        <div className="flex flex-wrap items-center justify-end gap-2">{headerActions}</div>
+      )}
 
-      <section className="mt-2 rounded-[10px] border border-border bg-surface p-6">
+      <section className="mt-2 rounded-[10px] border border-border bg-surface p-4 sm:p-6">
         <h2 className="font-heading text-lg font-semibold">Page URL</h2>
         <div className="mt-4 flex flex-col gap-1.5">
           <label className="text-[13px] text-muted">
@@ -76,7 +75,7 @@ export function LandingPageForm({ initial, submitLabel, onSubmit, headerActions 
         </div>
       </section>
 
-      <section className="mt-6 rounded-[10px] border border-border bg-surface p-6">
+      <section className="mt-6 rounded-[10px] border border-border bg-surface p-4 sm:p-6">
         <h2 className="font-heading text-lg font-semibold">Part 1 — Main offer</h2>
 
         <div className="mt-4 flex flex-col gap-1.5">
@@ -98,7 +97,7 @@ export function LandingPageForm({ initial, submitLabel, onSubmit, headerActions 
           />
         </div>
 
-        <div className="mt-4 grid grid-cols-2 gap-4">
+        <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="flex flex-col gap-1.5">
             <label className="text-[13px] text-muted">Price (৳)</label>
             <input
@@ -128,8 +127,8 @@ export function LandingPageForm({ initial, submitLabel, onSubmit, headerActions 
         </div>
       </section>
 
-      <section className="mt-6 rounded-[10px] border border-border bg-surface p-6">
-        <div className="flex items-center justify-between">
+      <section className="mt-6 rounded-[10px] border border-border bg-surface p-4 sm:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-heading text-lg font-semibold">Part 2 — What&apos;s inside</h2>
           <label className="flex items-center gap-2 text-sm text-muted">
             <input

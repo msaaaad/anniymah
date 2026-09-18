@@ -22,9 +22,9 @@ export function AdminNav() {
 
   return (
     <header className="border-b border-border bg-surface">
-      <div className="mx-auto flex max-w-[1180px] items-center justify-between px-[28px] py-4">
-        <span className="font-heading text-lg font-semibold">An Niymah Admin</span>
-        <nav className="flex items-center gap-4">
+      <div className="mx-auto flex max-w-[1180px] flex-wrap items-center justify-between gap-x-4 gap-y-3 px-4 py-4 sm:px-[28px]">
+        <span className="font-heading text-base font-semibold sm:text-lg">An Niymah Admin</span>
+        <nav className="flex items-center gap-3 sm:gap-4">
           {LINKS.map((link) => (
             <Link
               key={link.href}
@@ -40,7 +40,7 @@ export function AdminNav() {
           ))}
           <button
             onClick={handleLogout}
-            className="rounded-[8px] border border-border px-4 py-2 text-sm hover:border-sage-dark hover:text-sage-dark"
+            className="rounded-[8px] border border-border px-3 py-2 text-sm hover:border-sage-dark hover:text-sage-dark sm:px-4"
           >
             Log out
           </button>

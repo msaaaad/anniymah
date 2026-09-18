@@ -1,4 +1,5 @@
 import { getSupabaseAdmin } from "@/lib/supabase";
+import { deleteStorageImageIfOwned } from "@/lib/storage";
 import { MAX_LANDING_PAGES, type LandingPage, type Order, type OrderStatus } from "@/lib/types";
 
 export class LandingPageLimitError extends Error {
@@ -155,6 +156,8 @@ export async function updateLandingPage(
   id: string,
   patch: Partial<LandingPageInput>
 ): Promise<LandingPage | null> {
+  const existing = await getLandingPageById(id);
+
   const { data, error } = await getSupabaseAdmin()
     .from("landing_pages")
     .update({ ...toRowPatch(patch), updated_at: new Date().toISOString() })
@@ -162,12 +165,33 @@ export async function updateLandingPage(
     .select()
     .maybeSingle();
   if (error) throw new Error(`Failed to update landing page: ${error.message}`);
-  return data ? toLandingPage(data as LandingPageRow) : null;
+  if (!data) return null;
+
+  // Clean up the old image from Storage once the replacement is actually
+  // saved — deleting it earlier (e.g. right as the admin uploads a new one)
+  // would break the page if they navigate away without saving.
+  if (existing) {
+    if (patch.imageUrl !== undefined && patch.imageUrl !== existing.imageUrl) {
+      await deleteStorageImageIfOwned(existing.imageUrl);
+    }
+    if (patch.part2ImageUrl !== undefined && patch.part2ImageUrl !== existing.part2ImageUrl) {
+      await deleteStorageImageIfOwned(existing.part2ImageUrl);
+    }
+  }
+
+  return toLandingPage(data as LandingPageRow);
 }
 
 export async function deleteLandingPage(id: string): Promise<void> {
+  const existing = await getLandingPageById(id);
+
   const { error } = await getSupabaseAdmin().from("landing_pages").delete().eq("id", id);
   if (error) throw new Error(`Failed to delete landing page: ${error.message}`);
+
+  if (existing) {
+    await deleteStorageImageIfOwned(existing.imageUrl);
+    await deleteStorageImageIfOwned(existing.part2ImageUrl);
+  }
 }
 
 export async function listOrders(): Promise<Order[]> {

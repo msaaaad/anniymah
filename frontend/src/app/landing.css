@@ -9,12 +9,28 @@ input, select, textarea { font-size: 15px; }
 
 .container { max-width: 1180px; margin: 0 auto; padding: 0 28px; }
 
+/* ---------- GLASSMORPHIC EXPERIMENT (branch only) ----------
+   Ambient color behind the whole page so frosted glass panels have
+   something to actually refract — flat glass over a flat background
+   just reads as grey boxes. Fixed + isolated so it sits behind content
+   without leaking into the rest of the app (admin uses Tailwind). */
+.landing-body { position: relative; isolation: isolate; }
+.landing-body::before {
+  content: ''; position: fixed; inset: 0; z-index: -1;
+  background:
+    radial-gradient(650px circle at 12% 15%, rgba(192, 81, 18, .16), transparent 60%),
+    radial-gradient(550px circle at 88% 42%, rgba(216, 191, 166, .3), transparent 58%),
+    radial-gradient(750px circle at 45% 95%, rgba(192, 81, 18, .12), transparent 60%);
+  pointer-events: none;
+}
+
 /* ---------- Header ---------- */
 .site-header {
   position: sticky; top: 0; z-index: 20;
-  background: rgba(251, 246, 239, .92);
-  backdrop-filter: blur(6px);
-  border-bottom: 1px solid var(--border);
+  background: rgba(251, 246, 239, .55);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid rgba(255, 255, 255, .5);
 }
 .site-header .row {
   display: flex; align-items: center; justify-content: space-between;
@@ -87,11 +103,16 @@ section.section-premium {
 .hero p.lead { margin-top: 20px; color: var(--sage-tint); opacity: .85; font-size: 16.5px; max-width: 440px; }
 .hero .btn { margin-top: 28px; }
 .hero-visual {
-  border-radius: 16px; height: 340px;
+  border-radius: 26px; height: 340px; padding: 10px;
   display: flex; align-items: center; justify-content: center;
   overflow: hidden;
+  background: rgba(255, 255, 255, .1);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, .28);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, .35), inset 0 1px 0 rgba(255, 255, 255, .3);
 }
-.hero-visual img { filter: drop-shadow(0 25px 40px rgba(0, 0, 0, .45)); }
+.hero-visual img { border-radius: 18px; }
 .hero-contact { margin-top: 16px; font-size: 13.5px; color: var(--sage-tint); opacity: .75; }
 .hero-contact a { color: var(--rose); font-weight: 600; }
 
@@ -119,11 +140,18 @@ section.section-premium {
 .feature-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
 .feature-card {
   display: flex; gap: 14px; align-items: flex-start;
-  background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+  background: rgba(255, 255, 255, .45);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, .6);
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(43, 33, 26, .07), inset 0 1px 0 rgba(255, 255, 255, .5);
   padding: 18px;
 }
 .feature-icon {
-  width: 48px; height: 48px; border-radius: 10px; background: var(--sage-tint);
+  width: 48px; height: 48px; border-radius: 12px;
+  background: rgba(192, 81, 18, .12);
+  backdrop-filter: blur(6px);
   display: flex; align-items: center; justify-content: center; flex-shrink: 0;
 }
 .feature-card h3 { font-size: 15px; font-family: var(--font-body), sans-serif; font-weight: 600; }
@@ -132,8 +160,12 @@ section.section-premium {
 /* ---------- Product collection ---------- */
 .collection-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
 .collection-card {
-  background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .12);
-  border-radius: 12px; overflow: hidden;
+  background: rgba(255, 255, 255, .1);
+  backdrop-filter: blur(18px) saturate(180%);
+  -webkit-backdrop-filter: blur(18px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, .2);
+  border-radius: 18px; overflow: hidden;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, .25), inset 0 1px 0 rgba(255, 255, 255, .15);
 }
 .collection-media {
   aspect-ratio: 1 / 1; background: rgba(255, 255, 255, .04);
@@ -150,7 +182,12 @@ section.section-premium {
 /* ---------- Shipping trust bar ---------- */
 .shipping-bar {
   display: flex; flex-wrap: wrap; gap: 10px 24px; align-items: center; justify-content: center;
-  background: var(--sage); border-radius: 12px; padding: 16px 20px; margin: 30px 0;
+  background: rgba(192, 81, 18, .6);
+  backdrop-filter: blur(18px) saturate(160%);
+  -webkit-backdrop-filter: blur(18px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, .25);
+  border-radius: 18px; padding: 16px 20px; margin: 30px 0;
+  box-shadow: 0 10px 30px rgba(192, 81, 18, .25), inset 0 1px 0 rgba(255, 255, 255, .2);
 }
 .shipping-bar-item {
   display: flex; align-items: center; gap: 8px; color: #fff; font-size: 13.5px; font-weight: 600;
@@ -159,7 +196,12 @@ section.section-premium {
 
 /* ---------- Order section ---------- */
 .order-section {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  background: rgba(255, 255, 255, .5);
+  backdrop-filter: blur(24px) saturate(170%);
+  -webkit-backdrop-filter: blur(24px) saturate(170%);
+  border: 1px solid rgba(255, 255, 255, .6);
+  border-radius: 26px;
+  box-shadow: 0 15px 45px rgba(43, 33, 26, .1), inset 0 1px 0 rgba(255, 255, 255, .6);
   padding: 40px; margin: 20px 0 10px;
 }
 .order-grid { display: grid; grid-template-columns: 1.3fr 1fr; gap: 44px; align-items: start; }
@@ -168,8 +210,11 @@ section.section-premium {
 .field.full { grid-column: 1 / -1; }
 .field label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 7px; }
 .field input, .field textarea {
-  width: 100%; padding: 12px 14px; border: 1px solid var(--border); border-radius: 8px;
-  background: var(--surface); color: var(--text); outline: none;
+  width: 100%; padding: 12px 14px; border: 1px solid rgba(255, 255, 255, .6); border-radius: 10px;
+  background: rgba(255, 255, 255, .55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  color: var(--text); outline: none;
 }
 .field input:focus, .field textarea:focus { border-color: var(--sage); }
 .field input:disabled { color: var(--muted); }
@@ -177,17 +222,20 @@ section.section-premium {
 
 .qty-stepper {
   display: flex; align-items: center; width: fit-content;
-  border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, .6); border-radius: 10px; overflow: hidden;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 .qty-stepper button {
-  width: 42px; height: 44px; background: var(--surface); border: none;
+  width: 42px; height: 44px; background: rgba(255, 255, 255, .5); border: none;
   font-size: 18px; line-height: 1; color: var(--text); cursor: pointer;
 }
 .qty-stepper button:hover:not(:disabled) { background: var(--sage-tint); color: var(--sage-dark); }
 .qty-stepper button:disabled { color: var(--border); cursor: not-allowed; }
 .qty-stepper input {
   width: 48px; height: 44px; padding: 0; text-align: center; font-weight: 600;
-  border: none; border-left: 1px solid var(--border); border-right: 1px solid var(--border);
+  background: rgba(255, 255, 255, .3);
+  border: none; border-left: 1px solid rgba(255, 255, 255, .6); border-right: 1px solid rgba(255, 255, 255, .6);
   -moz-appearance: textfield;
 }
 .qty-stepper input::-webkit-outer-spin-button,
@@ -199,11 +247,14 @@ section.section-premium {
    as `label.delivery-option` to win and keep the row flex-laid-out. */
 label.delivery-option {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px;
+  border: 1px solid rgba(255, 255, 255, .5); border-radius: 12px; padding: 12px 14px;
   font-size: 14px; color: var(--text); cursor: pointer; margin-bottom: 0;
+  background: rgba(255, 255, 255, .3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
   transition: border-color .15s ease, background .15s ease;
 }
-.delivery-option.active { border-color: var(--sage); background: var(--sage-tint); }
+.delivery-option.active { border-color: var(--sage); background: rgba(192, 81, 18, .18); }
 /* Reset the `.field input { width:100%; padding; border }` rule, which also
    matches this radio since it lives inside a `.field.full` wrapper and would
    otherwise stretch its layout box and squeeze the label text onto its own line. */
@@ -213,14 +264,24 @@ label.delivery-option {
 }
 .delivery-option .charge { font-weight: 600; color: var(--sage-dark); white-space: nowrap; }
 
-.order-summary { background: var(--sage-tint); border-radius: 12px; padding: 22px; }
+.order-summary {
+  background: rgba(243, 226, 211, .5);
+  backdrop-filter: blur(16px) saturate(160%);
+  -webkit-backdrop-filter: blur(16px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, .5);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .5);
+  border-radius: 18px; padding: 22px;
+}
 .order-summary h4 { font-size: 15px; margin-bottom: 14px; font-family: var(--font-heading), serif; }
 .order-summary .row { display: flex; justify-content: space-between; font-size: 14px; padding: 6px 0; color: var(--text); }
-.order-summary .row.total { border-top: 1px solid var(--border); margin-top: 8px; padding-top: 12px; font-weight: 700; font-size: 16px; }
+.order-summary .row.total { border-top: 1px solid rgba(255, 255, 255, .6); margin-top: 8px; padding-top: 12px; font-weight: 700; font-size: 16px; }
 .order-summary .tk { font-weight: 500; opacity: .75; margin-right: 1px; }
 .wa-note {
   display: flex; gap: 10px; align-items: flex-start; font-size: 12.5px; color: var(--sage-dark);
-  background: var(--surface); border: 1px dashed var(--sage); border-radius: 8px; padding: 10px 12px; margin-top: 16px;
+  background: rgba(255, 255, 255, .35);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px dashed var(--sage); border-radius: 10px; padding: 10px 12px; margin-top: 16px;
 }
 .wa-note svg { width: 16px; height: 16px; flex-shrink: 0; margin-top: 1px; }
 
@@ -247,7 +308,10 @@ label.delivery-option {
 }
 .mobile-nav {
   display: none; flex-direction: column;
-  background: var(--surface); border-top: 1px solid var(--border);
+  background: rgba(251, 246, 239, .75);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-top: 1px solid rgba(255, 255, 255, .5);
   padding: 6px 28px 14px;
 }
 .mobile-nav a { padding: 13px 0; font-size: 15px; color: var(--text); border-bottom: 1px solid var(--border); }
@@ -257,7 +321,10 @@ label.delivery-option {
 /* ---------- sticky mobile order bar ---------- */
 .sticky-cta {
   display: none; position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
-  background: var(--surface); border-top: 1px solid var(--border);
+  background: rgba(251, 246, 239, .7);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border-top: 1px solid rgba(255, 255, 255, .5);
   padding: 12px 20px; box-shadow: 0 -6px 20px rgba(43, 33, 26, .08);
 }
 

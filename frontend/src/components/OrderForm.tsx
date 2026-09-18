@@ -11,14 +11,13 @@ type SubmitState = "idle" | "submitting" | "success" | "error";
 export function OrderForm({ price }: OrderFormProps) {
   const [quantity, setQuantity] = useState(1);
   const [state, setState] = useState<SubmitState>("idle");
-  const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
 
   const total = price * quantity;
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setState("submitting");
-    setError("");
 
     const form = event.currentTarget;
     const formData = new FormData(form);
@@ -41,115 +40,108 @@ export function OrderForm({ price }: OrderFormProps) {
         const body = await res.json().catch(() => ({}));
         throw new Error(body.error || "অর্ডার সাবমিট করা যায়নি, আবার চেষ্টা করুন।");
       }
+      setMessage("অর্ডার কনফার্ম হয়েছে! আমরা শীঘ্রই যোগাযোগ করব।");
       setState("success");
       form.reset();
       setQuantity(1);
     } catch (err) {
+      setMessage(err instanceof Error ? err.message : "কিছু একটা সমস্যা হয়েছে।");
       setState("error");
-      setError(err instanceof Error ? err.message : "কিছু একটা সমস্যা হয়েছে।");
     }
   }
 
-  if (state === "success") {
-    return (
-      <div className="rounded-[10px] border border-border bg-surface p-6 text-center">
-        <h3 className="font-heading text-xl font-semibold text-text">ধন্যবাদ!</h3>
-        <p className="mt-2 text-muted">
-          আপনার অর্ডারটি পেয়েছি। কনফার্ম করার জন্য শীঘ্রই আপনাকে ফোন করা হবে।
-        </p>
-      </div>
-    );
-  }
-
   return (
-    <form onSubmit={handleSubmit} id="order-form" className="rounded-[10px] border border-border bg-surface p-5 sm:p-6">
-      <h3 className="font-heading text-xl font-semibold text-text">অর্ডার করুন</h3>
+    <div className="order-section" id="order">
+      <div className="order-grid">
+        <form id="order-form" onSubmit={handleSubmit}>
+          {/* Honeypot — hidden from real customers, catches naive bots */}
+          <input
+            type="text"
+            name="company"
+            tabIndex={-1}
+            autoComplete="off"
+            style={{ position: "absolute", left: "-9999px", width: 0, height: 0, opacity: 0 }}
+            aria-hidden="true"
+          />
 
-      {/* Honeypot — hidden from real customers, catches naive bots */}
-      <input
-        type="text"
-        name="company"
-        tabIndex={-1}
-        autoComplete="off"
-        className="absolute -left-[9999px] h-0 w-0 opacity-0"
-        aria-hidden="true"
-      />
+          <div className="form-grid">
+            <div className="field">
+              <label htmlFor="customerName">Full name</label>
+              <input id="customerName" name="customerName" placeholder="আপনার নাম" required />
+            </div>
+            <div className="field">
+              <label htmlFor="phone">Phone number</label>
+              <input id="phone" name="phone" type="tel" placeholder="01XXXXXXXXX" required />
+            </div>
+            <div className="field full">
+              <label htmlFor="address">Delivery address</label>
+              <input id="address" name="address" placeholder="বাসা, রোড, এলাকা — শহর" required />
+            </div>
+            <div className="field">
+              <label htmlFor="quantity">Quantity</label>
+              <input
+                id="quantity"
+                name="quantity"
+                type="number"
+                min={1}
+                max={20}
+                value={quantity}
+                onChange={(e) => setQuantity(Math.max(1, Math.min(20, Number(e.target.value) || 1)))}
+              />
+            </div>
+            <div className="field">
+              <label htmlFor="notes">Notes (optional)</label>
+              <input id="notes" name="notes" placeholder="ল্যান্ডমার্ক, ডেলিভারির সময়, ইত্যাদি" />
+            </div>
+          </div>
 
-      <div className="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="customerName" className="text-[13px] text-muted">আপনার নাম</label>
-          <input
-            id="customerName"
-            name="customerName"
-            required
-            className="rounded-[8px] border border-border bg-surface px-3.5 py-3 focus:border-sage focus:outline-none"
-          />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="phone" className="text-[13px] text-muted">ফোন নাম্বার</label>
-          <input
-            id="phone"
-            name="phone"
-            type="tel"
-            required
-            className="rounded-[8px] border border-border bg-surface px-3.5 py-3 focus:border-sage focus:outline-none"
-          />
-        </div>
-        <div className="flex flex-col gap-1.5 sm:col-span-2">
-          <label htmlFor="address" className="text-[13px] text-muted">ঠিকানা</label>
-          <input
-            id="address"
-            name="address"
-            required
-            className="rounded-[8px] border border-border bg-surface px-3.5 py-3 focus:border-sage focus:outline-none"
-          />
-        </div>
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="quantity" className="text-[13px] text-muted">পরিমাণ</label>
-          <input
-            id="quantity"
-            name="quantity"
-            type="number"
-            min={1}
-            max={20}
-            value={quantity}
-            onChange={(e) => setQuantity(Math.max(1, Math.min(20, Number(e.target.value) || 1)))}
-            className="rounded-[8px] border border-border bg-surface px-3.5 py-3 focus:border-sage focus:outline-none"
-          />
-        </div>
-        <div className="flex flex-col gap-1.5 sm:col-span-2">
-          <label htmlFor="notes" className="text-[13px] text-muted">নোট (ঐচ্ছিক)</label>
-          <input
-            id="notes"
-            name="notes"
-            className="rounded-[8px] border border-border bg-surface px-3.5 py-3 focus:border-sage focus:outline-none"
-          />
+          <button type="submit" className="btn btn-primary btn-block" disabled={state === "submitting"}>
+            {state === "submitting" ? "Sending..." : "Confirm Order"}
+          </button>
+        </form>
+
+        <div className="order-summary">
+          <h4>Order summary</h4>
+          <div className="row">
+            <span>Quantity</span>
+            <span>{quantity}</span>
+          </div>
+          <div className="row">
+            <span>Unit price</span>
+            <span><span className="tk">৳</span>{price}</span>
+          </div>
+          <div className="row">
+            <span>Delivery</span>
+            <span style={{ color: "var(--sage-dark)", fontWeight: 600 }}>Free</span>
+          </div>
+          <div className="row total">
+            <span>Total</span>
+            <span><span className="tk">৳</span>{total}</span>
+          </div>
+          <div className="wa-note">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+              <path d="M9 12l2 2 4-4m5 2a9 9 0 1 1-18 0 9 9 0 0 1 18 0z" />
+            </svg>
+            <span>ডেলিভারি সম্পূর্ণ ফ্রি — Confirm করলেই আপনার অর্ডার আমাদের কাছে পৌঁছে যাবে।</span>
+          </div>
+
+          {(state === "success" || state === "error") && (
+            <div className={`order-status show ${state === "success" ? "success" : "error"}`}>
+              {state === "success" ? (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+              ) : (
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <circle cx="12" cy="12" r="9" />
+                  <path d="M12 8v5M12 16h.01" />
+                </svg>
+              )}
+              <span>{message}</span>
+            </div>
+          )}
         </div>
       </div>
-
-      <div className="mt-5 rounded-xl bg-sage-tint p-4">
-        <div className="flex items-center justify-between text-sm">
-          <span>একক মূল্য</span>
-          <span>৳{price}</span>
-        </div>
-        <div className="mt-2 flex items-center justify-between border-t border-border pt-2 font-semibold">
-          <span>মোট</span>
-          <span>৳{total}</span>
-        </div>
-        <div className="mt-3 rounded-lg border border-dashed border-border bg-surface/60 p-3 text-xs text-muted">
-          ফ্রি ডেলিভারি · ক্যাশ অন ডেলিভারি
-        </div>
-      </div>
-
-      {error && <p className="mt-3 text-sm text-rose-dark">{error}</p>}
-
-      <button
-        type="submit"
-        disabled={state === "submitting"}
-        className="mt-5 w-full rounded-[8px] bg-sage px-[26px] py-[13px] font-medium text-white transition-colors hover:bg-sage-dark disabled:opacity-60"
-      >
-        {state === "submitting" ? "সাবমিট হচ্ছে..." : "অর্ডার কনফার্ম করুন"}
-      </button>
-    </form>
+    </div>
   );
 }

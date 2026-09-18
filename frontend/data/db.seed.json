@@ -1,15 +1,15 @@
 {
   "landingPage": {
     "id": 1,
-    "title": "৪-ইন-১ পারফিউম কম্বো",
-    "description": "Hawas Ice, Bleu de Chanel, Dior Sauvage আর Vampire Blood — একসাথে একটি বক্সে। ঢাকার ভেতরে ফ্রি ডেলিভারি, ক্যাশ অন ডেলিভারি।",
+    "title": "৪টি জনপ্রিয় পারফিউম, এক কম্বোতে — মাত্র ৳999",
+    "description": "একসাথে পাচ্ছেন Hawas Ice, Bleu de Chanel, Dior Sauvage এবং Vampire Blood–এর মতো জনপ্রিয় সুগন্ধির প্রিমিয়াম কম্বো। নিজের জন্য হোক কিংবা প্রিয়জনকে গিফট — এক কম্বোতেই ৪টি পছন্দের সুবাস।",
     "price": 999,
-    "phone": "01700000000",
-    "imageUrl": "",
+    "phone": "01614-150325",
+    "imageUrl": "/images/combo-flatlay.webp",
     "part2Enabled": true,
     "part2Title": "কম্বোতে যা থাকছে",
-    "part2Text": "৪টি ভিন্ন সুগন্ধের ৩০ মিলি বোতল — অফিস, ডেট, পার্টি আর প্রতিদিনের জন্য চারটি আলাদা মুড।",
-    "part2ImageUrl": "",
+    "part2Text": "Hawas Ice — For Him\nDior Sauvage\nVampire Blood\nBleu de Chanel",
+    "part2ImageUrl": "/images/combo-box-open.webp",
     "updatedAt": "2026-09-18T00:00:00.000Z"
   },
   "orders": []

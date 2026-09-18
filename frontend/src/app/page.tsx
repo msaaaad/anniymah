@@ -1,93 +1,123 @@
 import { getLandingPage } from "@/lib/db";
+import { LandingHeader } from "@/components/LandingHeader";
 import { OrderForm } from "@/components/OrderForm";
+import "./landing.css";
 
 export const dynamic = "force-dynamic";
 
+const ICON_COLORS = ["#6B8F71", "#2E2A25", "#D98C86", "#8A8175"];
+
+function BottleIcon({ color }: { color: string }) {
+  return (
+    <svg viewBox="0 0 64 64" width="26" height="26" fill="none" stroke={color} strokeWidth="4">
+      <rect x="24" y="20" width="16" height="30" rx="2" />
+      <rect x="27" y="12" width="10" height="9" rx="2" />
+    </svg>
+  );
+}
+
 export default async function Home() {
   const landing = await getLandingPage();
+  const part2Items = landing.part2Text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
 
   return (
-    <div className="flex-1 pb-24 sm:pb-0">
-      <header className="border-b border-border bg-surface">
-        <div className="mx-auto flex max-w-[1180px] items-center justify-between px-[28px] py-4">
-          <span className="font-heading text-lg font-semibold">An Niymah</span>
-          <span className="text-sm text-muted">ঢাকার ভেতরে ফ্রি ডেলিভারি</span>
-        </div>
-      </header>
+    <div className="landing-body">
+      <LandingHeader />
 
-      <main className="mx-auto max-w-[1180px] px-[28px] py-10">
-        <section className="grid grid-cols-1 gap-10 lg:grid-cols-2 lg:items-center">
-          <div>
-            <span className="inline-block rounded-full bg-rose px-3 py-1 text-xs font-semibold text-white">
-              Trending
-            </span>
-            <h1 className="font-heading mt-4 text-[38px] font-semibold leading-tight sm:text-[46px]">
-              {landing.title}
-            </h1>
-            <p className="mt-4 text-[17px] text-muted">{landing.description}</p>
-            <div className="mt-6 flex items-baseline gap-2">
-              <span className="font-heading text-3xl font-semibold text-sage-dark">
-                ৳{landing.price}
-              </span>
-              <span className="text-sm text-muted">ফ্রি ডেলিভারি সহ</span>
+      <main className="container" id="top">
+        <section className="hero">
+          <div className="hero-grid">
+            <div>
+              <p className="eyebrow">কম্বো অফার</p>
+              <h1>{landing.title}</h1>
+              <p className="lead">{landing.description}</p>
+              <a href="#order" className="btn btn-primary">
+                Order now
+              </a>
+              {landing.phone && (
+                <p style={{ marginTop: 16, fontSize: 13.5, color: "var(--muted)" }}>
+                  সরাসরি কথা বলতে চান? কল করুন —{" "}
+                  <a href={`tel:${landing.phone}`} style={{ color: "var(--sage-dark)", fontWeight: 600 }}>
+                    {landing.phone}
+                  </a>
+                </p>
+              )}
             </div>
-            <a
-              href="#order-form"
-              className="mt-6 inline-block rounded-[8px] bg-sage px-[26px] py-[13px] font-medium text-white transition-colors hover:bg-sage-dark"
-            >
-              এখনই অর্ডার করুন
-            </a>
-          </div>
-          <div className="flex aspect-square items-center justify-center rounded-2xl bg-media-bg">
-            {landing.imageUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element -- admin-supplied external URL, no domain to allow-list yet
-              <img
-                src={landing.imageUrl}
-                alt={landing.title}
-                className="h-full w-full rounded-2xl object-cover"
-              />
-            ) : (
-              <span className="text-sm text-muted">প্রোডাক্ট ছবি শীঘ্রই যুক্ত হবে</span>
-            )}
+            <div className="hero-visual">
+              {landing.imageUrl ? (
+                // eslint-disable-next-line @next/next/no-img-element -- admin-uploaded local path, no remote domain to configure
+                <img
+                  src={landing.imageUrl}
+                  alt={landing.title}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                />
+              ) : (
+                <span style={{ fontSize: 13, color: "var(--muted)" }}>প্রোডাক্ট ছবি শীঘ্রই যুক্ত হবে</span>
+              )}
+            </div>
           </div>
         </section>
 
         {landing.part2Enabled && (
-          <section className="mt-16 rounded-2xl border border-border bg-surface p-6 sm:p-8">
-            <h2 className="font-heading text-2xl font-semibold sm:text-[28px]">
-              {landing.part2Title}
-            </h2>
-            <div className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 sm:items-center">
-              <div className="flex aspect-video items-center justify-center rounded-2xl bg-media-bg">
+          <section className="section" id="inside">
+            <div className="section-head">
+              <h2>{landing.part2Title}</h2>
+            </div>
+            <div className="inside-grid">
+              <div className="pdp-media" style={{ height: "auto", overflow: "hidden" }}>
                 {landing.part2ImageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- admin-supplied external URL, no domain to allow-list yet
+                  // eslint-disable-next-line @next/next/no-img-element -- admin-uploaded local path, no remote domain to configure
                   <img
                     src={landing.part2ImageUrl}
                     alt={landing.part2Title}
-                    className="h-full w-full rounded-2xl object-cover"
+                    style={{ width: "100%", display: "block" }}
                   />
                 ) : (
-                  <span className="text-sm text-muted">ছবি শীঘ্রই যুক্ত হবে</span>
+                  <span style={{ fontSize: 13, color: "var(--muted)", padding: 40 }}>ছবি শীঘ্রই যুক্ত হবে</span>
                 )}
               </div>
-              <p className="text-[17px] text-muted">{landing.part2Text}</p>
+              <div className="inside-list">
+                {part2Items.map((item, i) => (
+                  <div className="inside-item" key={item}>
+                    <div className="inside-icon">
+                      <BottleIcon color={ICON_COLORS[i % ICON_COLORS.length]} />
+                    </div>
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </section>
         )}
 
-        <section className="mt-16 max-w-xl">
+        <section className="section" id="order-section-wrap">
+          <div className="section-head">
+            <h2>Place your order</h2>
+          </div>
+          <p style={{ color: "var(--muted)", fontSize: 14.5, marginBottom: 24, maxWidth: 520 }}>
+            নিচের ফর্মটি পূরণ করে Confirm করুন — আপনার অর্ডারটি সরাসরি আমাদের কাছে চলে যাবে। ক্যাশ অন ডেলিভারিতে পেমেন্ট করবেন।
+          </p>
           <OrderForm price={landing.price} />
         </section>
       </main>
 
-      <div className="fixed inset-x-0 bottom-0 border-t border-border bg-surface p-3 sm:hidden">
-        <a
-          href="#order-form"
-          className="block w-full rounded-[8px] bg-sage px-[26px] py-[13px] text-center font-medium text-white"
-        >
-          এখনই অর্ডার করুন — ৳{landing.price}
+      <div className="sticky-cta">
+        <a href="#order" className="btn btn-primary btn-block">
+          Order now — ৳{landing.price}
         </a>
       </div>
+
+      <footer className="site-footer">
+        <div className="container">
+          <div className="footer-bottom">
+            <span>© {new Date().getFullYear()} An Niymah. All rights reserved.</span>
+            {landing.phone && <span>Inbox or call: {landing.phone}</span>}
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

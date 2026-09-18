@@ -2,6 +2,7 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import type { LandingPage } from "@/lib/types";
+import { ImageUploader } from "@/components/ImageUploader";
 
 type SaveState = "idle" | "saving" | "saved" | "error";
 
@@ -97,13 +98,11 @@ export default function AdminLandingPage() {
           </div>
         </div>
 
-        <div className="mt-4 flex flex-col gap-1.5">
-          <label className="text-[13px] text-muted">Image URL</label>
-          <input
+        <div className="mt-4">
+          <ImageUploader
+            label="Product image"
             value={form.imageUrl}
-            onChange={(e) => update("imageUrl", e.target.value)}
-            placeholder="https://..."
-            className="rounded-[8px] border border-border bg-surface px-3.5 py-3 focus:border-sage focus:outline-none"
+            onChange={(url) => update("imageUrl", url)}
           />
         </div>
       </section>
@@ -132,21 +131,22 @@ export default function AdminLandingPage() {
               />
             </div>
             <div className="mt-4 flex flex-col gap-1.5">
-              <label className="text-[13px] text-muted">Text</label>
+              <label className="text-[13px] text-muted">
+                Items shown on the page — one per line
+              </label>
               <textarea
                 value={form.part2Text}
                 onChange={(e) => update("part2Text", e.target.value)}
-                rows={3}
+                rows={4}
+                placeholder={"Hawas Ice — For Him\nDior Sauvage\nVampire Blood\nBleu de Chanel"}
                 className="rounded-[8px] border border-border bg-surface px-3.5 py-3 focus:border-sage focus:outline-none"
               />
             </div>
-            <div className="mt-4 flex flex-col gap-1.5">
-              <label className="text-[13px] text-muted">Image URL</label>
-              <input
+            <div className="mt-4">
+              <ImageUploader
+                label="Image"
                 value={form.part2ImageUrl}
-                onChange={(e) => update("part2ImageUrl", e.target.value)}
-                placeholder="https://..."
-                className="rounded-[8px] border border-border bg-surface px-3.5 py-3 focus:border-sage focus:outline-none"
+                onChange={(url) => update("part2ImageUrl", url)}
               />
             </div>
           </>

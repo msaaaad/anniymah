@@ -107,6 +107,24 @@ input, select, textarea { font-size: 15px; }
 .field input:disabled { color: var(--muted); }
 .field textarea { resize: vertical; min-height: 80px; }
 
+.qty-stepper {
+  display: flex; align-items: center; width: fit-content;
+  border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+}
+.qty-stepper button {
+  width: 42px; height: 44px; background: var(--surface); border: none;
+  font-size: 18px; line-height: 1; color: var(--text); cursor: pointer;
+}
+.qty-stepper button:hover:not(:disabled) { background: var(--sage-tint); color: var(--sage-dark); }
+.qty-stepper button:disabled { color: var(--border); cursor: not-allowed; }
+.qty-stepper input {
+  width: 48px; height: 44px; padding: 0; text-align: center; font-weight: 600;
+  border: none; border-left: 1px solid var(--border); border-right: 1px solid var(--border);
+  -moz-appearance: textfield;
+}
+.qty-stepper input::-webkit-outer-spin-button,
+.qty-stepper input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
 .order-summary { background: var(--sage-tint); border-radius: 12px; padding: 22px; }
 .order-summary h4 { font-size: 15px; margin-bottom: 14px; font-family: var(--font-heading), serif; }
 .order-summary .row { display: flex; justify-content: space-between; font-size: 14px; padding: 6px 0; color: var(--text); }

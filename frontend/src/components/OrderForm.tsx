@@ -102,15 +102,25 @@ export function OrderForm({ landingPageId, price }: OrderFormProps) {
             </div>
             <div className="field">
               <label htmlFor="quantity">Quantity</label>
-              <input
-                id="quantity"
-                name="quantity"
-                type="number"
-                min={1}
-                max={20}
-                value={quantity}
-                onChange={(e) => setQuantity(Math.max(1, Math.min(20, Number(e.target.value) || 1)))}
-              />
+              <div className="qty-stepper">
+                <button
+                  type="button"
+                  onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+                  disabled={quantity <= 1}
+                  aria-label="Decrease quantity"
+                >
+                  −
+                </button>
+                <input id="quantity" type="text" inputMode="numeric" readOnly value={quantity} aria-live="polite" />
+                <button
+                  type="button"
+                  onClick={() => setQuantity((q) => Math.min(20, q + 1))}
+                  disabled={quantity >= 20}
+                  aria-label="Increase quantity"
+                >
+                  +
+                </button>
+              </div>
             </div>
             <div className="field">
               <label htmlFor="notes">Notes (optional)</label>

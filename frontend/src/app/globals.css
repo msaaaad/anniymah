@@ -1,0 +1,50 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #FAF6F0;
+  --surface: #FFFFFF;
+  --sage: #6B8F71;
+  --sage-dark: #57765D;
+  --sage-tint: #E9F0EA;
+  --rose: #D98C86;
+  --rose-dark: #C1746E;
+  --rose-tint: #F7E9E7;
+  --text: #2E2A25;
+  --muted: #8A8175;
+  --border: #E9E1D3;
+  --media-bg: #F2E9DD;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-sage: var(--sage);
+  --color-sage-dark: var(--sage-dark);
+  --color-sage-tint: var(--sage-tint);
+  --color-rose: var(--rose);
+  --color-rose-dark: var(--rose-dark);
+  --color-rose-tint: var(--rose-tint);
+  --color-text: var(--text);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-media-bg: var(--media-bg);
+  --font-heading: var(--font-fraunces);
+  --font-body: var(--font-inter);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body), sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+h1, h2, h3, .font-heading {
+  font-family: var(--font-heading), serif;
+}
+
+/* Prevent iOS Safari auto-zoom on focused inputs */
+input, select, textarea {
+  font-size: 16px;
+}

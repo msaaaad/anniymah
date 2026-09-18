@@ -1,0 +1,16 @@
+{
+  "landingPage": {
+    "id": 1,
+    "title": "৪-ইন-১ পারফিউম কম্বো",
+    "description": "Hawas Ice, Bleu de Chanel, Dior Sauvage আর Vampire Blood — একসাথে একটি বক্সে। ঢাকার ভেতরে ফ্রি ডেলিভারি, ক্যাশ অন ডেলিভারি।",
+    "price": 999,
+    "phone": "01700000000",
+    "imageUrl": "",
+    "part2Enabled": true,
+    "part2Title": "কম্বোতে যা থাকছে",
+    "part2Text": "৪টি ভিন্ন সুগন্ধের ৩০ মিলি বোতল — অফিস, ডেট, পার্টি আর প্রতিদিনের জন্য চারটি আলাদা মুড।",
+    "part2ImageUrl": "",
+    "updatedAt": "2026-09-18T00:00:00.000Z"
+  },
+  "orders": []
+}

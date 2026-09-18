@@ -38,8 +38,10 @@ export default function AdminLoginPage() {
     <div className="flex min-h-screen flex-1 items-center justify-center bg-bg px-6">
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-sm rounded-[10px] border border-border bg-surface p-6 shadow-[0_1px_2px_rgba(46,42,37,.04),0_6px_20px_rgba(46,42,37,.05)]"
+        className="w-full max-w-sm rounded-[10px] border border-border bg-surface p-6 shadow-[var(--shadow)]"
       >
+        {/* eslint-disable-next-line @next/next/no-img-element -- small static logo, no next/image config needed */}
+        <img src="/logo-mark.webp" alt="" width={40} height={40} className="mb-3 rounded-lg" />
         <h1 className="font-heading text-xl font-semibold text-text">Admin Login</h1>
         <p className="mt-1 text-sm text-muted">Anniymah admin dashboard</p>
 

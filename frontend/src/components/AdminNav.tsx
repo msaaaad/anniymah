@@ -23,7 +23,11 @@ export function AdminNav() {
   return (
     <header className="border-b border-border bg-surface">
       <div className="mx-auto flex max-w-[1180px] flex-wrap items-center justify-between gap-x-4 gap-y-3 px-4 py-4 sm:px-[28px]">
-        <span className="font-heading text-base font-semibold sm:text-lg">Anniymah Admin</span>
+        <span className="flex items-center gap-2 font-heading text-base font-semibold sm:text-lg">
+          {/* eslint-disable-next-line @next/next/no-img-element -- small static logo, no next/image config needed */}
+          <img src="/logo-mark.webp" alt="" width={28} height={28} className="rounded-md" />
+          Anniymah Admin
+        </span>
         <nav className="flex items-center gap-3 sm:gap-4">
           {LINKS.map((link) => (
             <Link

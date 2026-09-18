@@ -18,21 +18,26 @@ shouty.
 
 | Token | Hex | Usage |
 | --- | --- | --- |
-| `--bg` | `#FAF6F0` | Page background |
+| `--bg` | `#FBF6EF` | Page background |
 | `--surface` | `#FFFFFF` | Cards, header, inputs |
-| `--sage` | `#6B8F71` | Primary buttons, links, active states |
-| `--sage-dark` | `#57765D` | Hover states, price text |
-| `--sage-tint` | `#E9F0EA` | Soft backgrounds (trust badges, notes, payment option) |
-| `--rose` | `#D98C86` | Accent badges (e.g. "Trending") |
-| `--rose-dark` | `#C1746E` | Rose hover state |
-| `--rose-tint` | `#F7E9E7` | Soft rose backgrounds |
-| `--text` | `#2E2A25` | Body text, headings |
-| `--muted` | `#8A8175` | Secondary text, labels, captions |
-| `--border` | `#E9E1D3` | Card borders, dividers, input borders |
-| `--media-bg` | `#F2E9DD` | Image/icon placeholder backgrounds |
+| `--sage` | `#C05112` | Primary buttons, links, active states — exact logo background orange |
+| `--sage-dark` | `#9C420E` | Hover states, price text |
+| `--sage-tint` | `#F3E2D3` | Soft backgrounds (trust badges, notes, payment option) |
+| `--rose` | `#EBD7C7` | Accent badges (e.g. "Trending") — exact logo cream/ivory mark color |
+| `--rose-dark` | `#D8BFA6` | Rose hover state |
+| `--rose-tint` | `#FBF6EF` | Soft rose backgrounds — doubles as page bg |
+| `--text` | `#2B211A` | Body text, headings — warm near-black, pairs with orange/cream |
+| `--muted` | `#8C7565` | Secondary text, labels, captions |
+| `--border` | `#EFE0CF` | Card borders, dividers, input borders |
+| `--media-bg` | `#F3E2D3` | Image/icon placeholder backgrounds |
 
 Never introduce new colors outside this palette without updating this doc —
 consistency matters more than any single component looking "better."
+
+Token names (`--sage`, `--rose`) are historical from the original green/rose
+mockup and don't describe the current orange/cream palette literally — kept
+as-is to avoid a wide rename across the codebase. Treat them as slots
+("primary", "accent"), not as a literal color description.
 
 ## Typography
 
@@ -99,6 +104,18 @@ consistency matters more than any single component looking "better."
 - Hamburger icon toggles a dropdown panel directly under the header
   (`.mobile-nav`), not an overlay — keeps it simple and avoids z-index/scroll-
   lock complexity for this scope.
+
+## Logo
+
+The brand mark is the calligraphic "ل" glyph in a rounded rectangle, cream
+(`--rose` / `#EBD7C7`) on the brand orange (`--sage` / `#C05112`) — cropped
+square from the source artwork with the background extended to match exactly,
+so it drops in seamlessly anywhere `--sage` is used as a surface color.
+Lives at `frontend/public/logo-mark.webp` (240×240) and is used at small
+sizes (28–40px) next to the wordmark in both the public header and admin
+nav — never as a standalone hero graphic. Favicon/app-icon files
+(`favicon.ico`, `icon.png`, `apple-icon.png`) are generated from the same
+crop, so regenerate all of them together if the mark ever changes.
 
 ## Iconography
 

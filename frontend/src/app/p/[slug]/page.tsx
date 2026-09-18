@@ -6,7 +6,7 @@ import "../../landing.css";
 
 export const dynamic = "force-dynamic";
 
-const ICON_COLORS = ["#6B8F71", "#2E2A25", "#D98C86", "#8A8175"];
+const ICON_COLORS = ["var(--sage)", "var(--text)", "var(--rose)", "var(--muted)"];
 
 function BottleIcon({ color }: { color: string }) {
   return (

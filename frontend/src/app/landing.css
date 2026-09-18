@@ -12,7 +12,7 @@ input, select, textarea { font-size: 15px; }
 /* ---------- Header ---------- */
 .site-header {
   position: sticky; top: 0; z-index: 20;
-  background: rgba(250, 246, 240, .92);
+  background: rgba(251, 246, 239, .92);
   backdrop-filter: blur(6px);
   border-bottom: 1px solid var(--border);
 }
@@ -20,7 +20,9 @@ input, select, textarea { font-size: 15px; }
   display: flex; align-items: center; justify-content: space-between;
   padding: 18px 28px;
 }
-.brand { display: flex; flex-direction: column; gap: 1px; }
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-mark { border-radius: 8px; flex-shrink: 0; }
+.brand-text { display: flex; flex-direction: column; gap: 1px; }
 .brand .name { font-family: var(--font-heading), serif; font-size: 23px; font-weight: 600; letter-spacing: .2px; }
 .brand .tag { font-size: 12.5px; color: var(--muted); }
 .main-nav { display: flex; align-items: center; gap: 34px; }
@@ -190,7 +192,7 @@ label.delivery-option {
 .sticky-cta {
   display: none; position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
   background: var(--surface); border-top: 1px solid var(--border);
-  padding: 12px 20px; box-shadow: 0 -6px 20px rgba(46, 42, 37, .08);
+  padding: 12px 20px; box-shadow: 0 -6px 20px rgba(43, 33, 26, .08);
 }
 
 /* ---------- Responsive ---------- */

@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { isValidBangladeshiPhone } from "@/lib/phone";
 
 interface OrderFormProps {
   landingPageId: string;
@@ -13,19 +14,28 @@ export function OrderForm({ landingPageId, price }: OrderFormProps) {
   const [quantity, setQuantity] = useState(1);
   const [state, setState] = useState<SubmitState>("idle");
   const [message, setMessage] = useState("");
+  const [phoneError, setPhoneError] = useState("");
 
   const total = price * quantity;
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setState("submitting");
 
     const form = event.currentTarget;
     const formData = new FormData(form);
+    const phone = String(formData.get("phone") ?? "");
+
+    if (!isValidBangladeshiPhone(phone)) {
+      setPhoneError("সঠিক বাংলাদেশী মোবাইল নম্বর দিন (যেমন: 01712345678)");
+      return;
+    }
+    setPhoneError("");
+    setState("submitting");
+
     const payload = {
       landingPageId,
       customerName: formData.get("customerName"),
-      phone: formData.get("phone"),
+      phone,
       address: formData.get("address"),
       quantity,
       notes: formData.get("notes"),
@@ -73,7 +83,18 @@ export function OrderForm({ landingPageId, price }: OrderFormProps) {
             </div>
             <div className="field">
               <label htmlFor="phone">Phone number</label>
-              <input id="phone" name="phone" type="tel" placeholder="01XXXXXXXXX" required />
+              <input
+                id="phone"
+                name="phone"
+                type="tel"
+                inputMode="numeric"
+                placeholder="01XXXXXXXXX"
+                onChange={() => phoneError && setPhoneError("")}
+                required
+              />
+              {phoneError && (
+                <p style={{ marginTop: 6, fontSize: 12.5, color: "var(--rose-dark)" }}>{phoneError}</p>
+              )}
             </div>
             <div className="field full">
               <label htmlFor="address">Delivery address</label>

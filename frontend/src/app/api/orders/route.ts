@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createOrder, listOrders } from "@/lib/db";
+import { isValidBangladeshiPhone, normalizePhone } from "@/lib/phone";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/session";
 
 export async function GET(request: NextRequest) {
@@ -39,12 +40,25 @@ export async function POST(request: NextRequest) {
       { status: 400 }
     );
   }
+  if (!isValidBangladeshiPhone(phone)) {
+    return NextResponse.json(
+      { error: "সঠিক বাংলাদেশী মোবাইল নম্বর দিন (যেমন: 01712345678)" },
+      { status: 400 }
+    );
+  }
   if (quantity < 1 || quantity > 20) {
     return NextResponse.json({ error: "Invalid quantity" }, { status: 400 });
   }
 
   try {
-    const order = await createOrder({ landingPageId, customerName, phone, address, quantity, notes });
+    const order = await createOrder({
+      landingPageId,
+      customerName,
+      phone: normalizePhone(phone),
+      address,
+      quantity,
+      notes,
+    });
     return NextResponse.json(order, { status: 201 });
   } catch {
     return NextResponse.json({ error: "Landing page not found" }, { status: 400 });

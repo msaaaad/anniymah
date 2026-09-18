@@ -23,12 +23,16 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ ok: true }, { status: 201 });
   }
 
+  const landingPageId = typeof body.landingPageId === "string" ? body.landingPageId : "";
   const customerName = typeof body.customerName === "string" ? body.customerName.trim() : "";
   const phone = typeof body.phone === "string" ? body.phone.trim() : "";
   const address = typeof body.address === "string" ? body.address.trim() : "";
   const quantity = Number(body.quantity) || 1;
   const notes = typeof body.notes === "string" ? body.notes.trim() : "";
 
+  if (!landingPageId) {
+    return NextResponse.json({ error: "Missing landing page" }, { status: 400 });
+  }
   if (!customerName || !phone || !address) {
     return NextResponse.json(
       { error: "Name, phone, and address are required" },
@@ -39,6 +43,10 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Invalid quantity" }, { status: 400 });
   }
 
-  const order = await createOrder({ customerName, phone, address, quantity, notes });
-  return NextResponse.json(order, { status: 201 });
+  try {
+    const order = await createOrder({ landingPageId, customerName, phone, address, quantity, notes });
+    return NextResponse.json(order, { status: 201 });
+  } catch {
+    return NextResponse.json({ error: "Landing page not found" }, { status: 400 });
+  }
 }

@@ -16,4 +16,10 @@ export const env = {
   get sessionSecret() {
     return required("SESSION_SECRET");
   },
+  get supabaseUrl() {
+    return required("NEXT_PUBLIC_SUPABASE_URL");
+  },
+  get supabaseServiceRoleKey() {
+    return required("SUPABASE_SERVICE_ROLE_KEY");
+  },
 };

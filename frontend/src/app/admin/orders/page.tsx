@@ -7,6 +7,7 @@ const STATUS_LABEL: Record<OrderStatus, string> = {
   pending: "Pending",
   confirmed: "Confirmed",
   delivered: "Delivered",
+  rejected: "Rejected",
   cancelled: "Cancelled",
 };
 
@@ -14,6 +15,7 @@ const STATUS_STYLE: Record<OrderStatus, string> = {
   pending: "bg-media-bg text-text",
   confirmed: "bg-sage-tint text-sage-dark",
   delivered: "bg-sage text-white",
+  rejected: "bg-rose-tint text-rose-dark",
   cancelled: "bg-rose-tint text-rose-dark",
 };
 
@@ -67,6 +69,7 @@ export default function AdminOrdersPage() {
                     <p className="font-medium">{order.customerName}</p>
                     <p className="text-sm text-muted">
                       {order.phone} · ৳{order.total} · {new Date(order.createdAt).toLocaleString()}
+                      {order.landingPageSlug && <> · from /p/{order.landingPageSlug}</>}
                     </p>
                   </div>
                   <span

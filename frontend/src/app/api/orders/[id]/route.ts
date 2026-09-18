@@ -3,7 +3,7 @@ import { updateOrderStatus } from "@/lib/db";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/session";
 import type { OrderStatus } from "@/lib/types";
 
-const VALID_STATUSES: OrderStatus[] = ["pending", "confirmed", "delivered", "cancelled"];
+const VALID_STATUSES: OrderStatus[] = ["pending", "confirmed", "delivered", "cancelled", "rejected"];
 
 export async function PATCH(
   request: NextRequest,

@@ -34,13 +34,6 @@ yarn-error.log*
 .env*
 !.env.example
 
-# local data store (contains customer PII once orders come in)
-/data/db.json
-
-# admin-uploaded images (not repo assets)
-/public/uploads/*
-!/public/uploads/.gitkeep
-
 # vercel
 .vercel
 

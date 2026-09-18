@@ -30,7 +30,7 @@ export default function AdminLoginPage() {
       return;
     }
 
-    router.push("/admin/landing");
+    router.push("/admin/pages");
     router.refresh();
   }
 

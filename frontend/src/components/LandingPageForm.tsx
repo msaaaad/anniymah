@@ -1,59 +1,80 @@
 "use client";
 
-import { FormEvent, useEffect, useState } from "react";
-import type { LandingPage } from "@/lib/types";
+import { FormEvent, ReactNode, useState } from "react";
 import { ImageUploader } from "@/components/ImageUploader";
+
+export interface LandingPageFormValues {
+  slug: string;
+  title: string;
+  description: string;
+  price: number;
+  phone: string;
+  imageUrl: string;
+  part2Enabled: boolean;
+  part2Title: string;
+  part2Text: string;
+  part2ImageUrl: string;
+}
+
+interface LandingPageFormProps {
+  initial: LandingPageFormValues;
+  submitLabel: string;
+  onSubmit: (values: LandingPageFormValues) => Promise<string | void>;
+  headerActions?: ReactNode;
+}
 
 type SaveState = "idle" | "saving" | "saved" | "error";
 
-export default function AdminLandingPage() {
-  const [form, setForm] = useState<LandingPage | null>(null);
+export function LandingPageForm({ initial, submitLabel, onSubmit, headerActions }: LandingPageFormProps) {
+  const [values, setValues] = useState<LandingPageFormValues>(initial);
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    fetch("/api/landing")
-      .then((res) => res.json())
-      .then(setForm);
-  }, []);
-
-  function update<K extends keyof LandingPage>(key: K, value: LandingPage[K]) {
-    setForm((prev) => (prev ? { ...prev, [key]: value } : prev));
+  function update<K extends keyof LandingPageFormValues>(key: K, value: LandingPageFormValues[K]) {
+    setValues((prev) => ({ ...prev, [key]: value }));
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!form) return;
     setSaveState("saving");
     setError("");
 
-    const res = await fetch("/api/landing", {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
-
-    if (!res.ok) {
-      const body = await res.json().catch(() => ({}));
-      setError(body.error || "Save failed");
+    const errorMessage = await onSubmit(values);
+    if (errorMessage) {
+      setError(errorMessage);
       setSaveState("error");
       return;
     }
-
-    const updated = await res.json();
-    setForm(updated);
     setSaveState("saved");
     setTimeout(() => setSaveState("idle"), 2000);
   }
 
-  if (!form) {
-    return <p className="text-muted">Loading...</p>;
-  }
-
   return (
     <form onSubmit={handleSubmit} className="max-w-2xl">
-      <h1 className="font-heading text-2xl font-semibold">Landing Page</h1>
-      <p className="mt-1 text-sm text-muted">Edit the content shown on the public landing page.</p>
+      <div className="flex items-center justify-between">
+        <div />
+        {headerActions}
+      </div>
+
+      <section className="mt-2 rounded-[10px] border border-border bg-surface p-6">
+        <h2 className="font-heading text-lg font-semibold">Page URL</h2>
+        <div className="mt-4 flex flex-col gap-1.5">
+          <label className="text-[13px] text-muted">
+            Slug — lowercase letters, numbers, hyphens only
+          </label>
+          <div className="flex items-center gap-1 text-sm text-muted">
+            <span>/p/</span>
+            <input
+              value={values.slug}
+              onChange={(e) => update("slug", e.target.value.toLowerCase())}
+              placeholder="combo-offer"
+              pattern="[a-z0-9]+(-[a-z0-9]+)*"
+              required
+              className="flex-1 rounded-[8px] border border-border bg-surface px-3.5 py-3 text-text focus:border-sage focus:outline-none"
+            />
+          </div>
+        </div>
+      </section>
 
       <section className="mt-6 rounded-[10px] border border-border bg-surface p-6">
         <h2 className="font-heading text-lg font-semibold">Part 1 — Main offer</h2>
@@ -61,7 +82,7 @@ export default function AdminLandingPage() {
         <div className="mt-4 flex flex-col gap-1.5">
           <label className="text-[13px] text-muted">Title</label>
           <input
-            value={form.title}
+            value={values.title}
             onChange={(e) => update("title", e.target.value)}
             className="rounded-[8px] border border-border bg-surface px-3.5 py-3 focus:border-sage focus:outline-none"
           />
@@ -70,7 +91,7 @@ export default function AdminLandingPage() {
         <div className="mt-4 flex flex-col gap-1.5">
           <label className="text-[13px] text-muted">Description</label>
           <textarea
-            value={form.description}
+            value={values.description}
             onChange={(e) => update("description", e.target.value)}
             rows={3}
             className="rounded-[8px] border border-border bg-surface px-3.5 py-3 focus:border-sage focus:outline-none"
@@ -83,7 +104,7 @@ export default function AdminLandingPage() {
             <input
               type="number"
               min={0}
-              value={form.price}
+              value={values.price}
               onChange={(e) => update("price", Number(e.target.value))}
               className="rounded-[8px] border border-border bg-surface px-3.5 py-3 focus:border-sage focus:outline-none"
             />
@@ -91,7 +112,7 @@ export default function AdminLandingPage() {
           <div className="flex flex-col gap-1.5">
             <label className="text-[13px] text-muted">Contact phone</label>
             <input
-              value={form.phone}
+              value={values.phone}
               onChange={(e) => update("phone", e.target.value)}
               className="rounded-[8px] border border-border bg-surface px-3.5 py-3 focus:border-sage focus:outline-none"
             />
@@ -101,7 +122,7 @@ export default function AdminLandingPage() {
         <div className="mt-4">
           <ImageUploader
             label="Product image"
-            value={form.imageUrl}
+            value={values.imageUrl}
             onChange={(url) => update("imageUrl", url)}
           />
         </div>
@@ -113,19 +134,19 @@ export default function AdminLandingPage() {
           <label className="flex items-center gap-2 text-sm text-muted">
             <input
               type="checkbox"
-              checked={form.part2Enabled}
+              checked={values.part2Enabled}
               onChange={(e) => update("part2Enabled", e.target.checked)}
             />
             Enabled
           </label>
         </div>
 
-        {form.part2Enabled && (
+        {values.part2Enabled && (
           <>
             <div className="mt-4 flex flex-col gap-1.5">
               <label className="text-[13px] text-muted">Title</label>
               <input
-                value={form.part2Title}
+                value={values.part2Title}
                 onChange={(e) => update("part2Title", e.target.value)}
                 className="rounded-[8px] border border-border bg-surface px-3.5 py-3 focus:border-sage focus:outline-none"
               />
@@ -135,7 +156,7 @@ export default function AdminLandingPage() {
                 Items shown on the page — one per line
               </label>
               <textarea
-                value={form.part2Text}
+                value={values.part2Text}
                 onChange={(e) => update("part2Text", e.target.value)}
                 rows={4}
                 placeholder={"Hawas Ice — For Him\nDior Sauvage\nVampire Blood\nBleu de Chanel"}
@@ -145,7 +166,7 @@ export default function AdminLandingPage() {
             <div className="mt-4">
               <ImageUploader
                 label="Image"
-                value={form.part2ImageUrl}
+                value={values.part2ImageUrl}
                 onChange={(url) => update("part2ImageUrl", url)}
               />
             </div>
@@ -160,7 +181,7 @@ export default function AdminLandingPage() {
         disabled={saveState === "saving"}
         className="mt-6 rounded-[8px] bg-sage px-[26px] py-[13px] font-medium text-white transition-colors hover:bg-sage-dark disabled:opacity-60"
       >
-        {saveState === "saving" ? "Saving..." : saveState === "saved" ? "Saved ✓" : "Save changes"}
+        {saveState === "saving" ? "Saving..." : saveState === "saved" ? "Saved ✓" : submitLabel}
       </button>
     </form>
   );

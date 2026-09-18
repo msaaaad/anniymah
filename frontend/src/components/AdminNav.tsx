@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 
 const LINKS = [
-  { href: "/admin/landing", label: "Landing Page" },
+  { href: "/admin/pages", label: "Pages" },
   { href: "/admin/orders", label: "Orders" },
 ];
 
@@ -30,7 +30,7 @@ export function AdminNav() {
               key={link.href}
               href={link.href}
               className={
-                pathname === link.href
+                pathname.startsWith(link.href)
                   ? "text-sm font-semibold text-sage-dark"
                   : "text-sm text-muted hover:text-text"
               }

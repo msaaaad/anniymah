@@ -8,7 +8,7 @@ export async function proxy(request: NextRequest) {
 
   if (pathname === "/admin/login") {
     if (authorized) {
-      return NextResponse.redirect(new URL("/admin/landing", request.url));
+      return NextResponse.redirect(new URL("/admin/pages", request.url));
     }
     return NextResponse.next();
   }

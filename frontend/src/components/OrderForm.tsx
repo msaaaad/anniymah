@@ -3,12 +3,13 @@
 import { FormEvent, useState } from "react";
 
 interface OrderFormProps {
+  landingPageId: string;
   price: number;
 }
 
 type SubmitState = "idle" | "submitting" | "success" | "error";
 
-export function OrderForm({ price }: OrderFormProps) {
+export function OrderForm({ landingPageId, price }: OrderFormProps) {
   const [quantity, setQuantity] = useState(1);
   const [state, setState] = useState<SubmitState>("idle");
   const [message, setMessage] = useState("");
@@ -22,6 +23,7 @@ export function OrderForm({ price }: OrderFormProps) {
     const form = event.currentTarget;
     const formData = new FormData(form);
     const payload = {
+      landingPageId,
       customerName: formData.get("customerName"),
       phone: formData.get("phone"),
       address: formData.get("address"),

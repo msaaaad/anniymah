@@ -1,7 +1,10 @@
-export type OrderStatus = "pending" | "confirmed" | "delivered" | "cancelled";
+export type OrderStatus = "pending" | "confirmed" | "delivered" | "cancelled" | "rejected";
+
+export const MAX_LANDING_PAGES = 4;
 
 export interface LandingPage {
-  id: number;
+  id: string;
+  slug: string;
   title: string;
   description: string;
   price: number;
@@ -11,11 +14,14 @@ export interface LandingPage {
   part2Title: string;
   part2Text: string;
   part2ImageUrl: string;
+  createdAt: string;
   updatedAt: string;
 }
 
 export interface Order {
   id: string;
+  landingPageId: string | null;
+  landingPageSlug: string | null;
   customerName: string;
   phone: string;
   address: string;
@@ -26,9 +32,4 @@ export interface Order {
   status: OrderStatus;
   createdAt: string;
   confirmedAt: string | null;
-}
-
-export interface Database {
-  landingPage: LandingPage;
-  orders: Order[];
 }

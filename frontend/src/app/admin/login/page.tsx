@@ -41,7 +41,7 @@ export default function AdminLoginPage() {
         className="w-full max-w-sm rounded-[10px] border border-border bg-surface p-6 shadow-[0_1px_2px_rgba(46,42,37,.04),0_6px_20px_rgba(46,42,37,.05)]"
       >
         <h1 className="font-heading text-xl font-semibold text-text">Admin Login</h1>
-        <p className="mt-1 text-sm text-muted">An Niymah admin dashboard</p>
+        <p className="mt-1 text-sm text-muted">Anniymah admin dashboard</p>
 
         <div className="mt-5 flex flex-col gap-1.5">
           <label htmlFor="email" className="text-[13px] text-muted">Email</label>

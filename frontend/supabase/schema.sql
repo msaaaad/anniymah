@@ -1,4 +1,4 @@
--- An Niymah MVP — schema v2: multiple landing pages (max 4, enforced in the app),
+-- Anniymah MVP — schema v2: multiple landing pages (max 4, enforced in the app),
 -- each with its own public URL at /p/[slug]. Run in Supabase SQL Editor.
 --
 -- This REPLACES the earlier single-row `landing_page` table. Safe to run

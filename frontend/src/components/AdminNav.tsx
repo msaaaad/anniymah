@@ -23,7 +23,7 @@ export function AdminNav() {
   return (
     <header className="border-b border-border bg-surface">
       <div className="mx-auto flex max-w-[1180px] flex-wrap items-center justify-between gap-x-4 gap-y-3 px-4 py-4 sm:px-[28px]">
-        <span className="font-heading text-base font-semibold sm:text-lg">An Niymah Admin</span>
+        <span className="font-heading text-base font-semibold sm:text-lg">Anniymah Admin</span>
         <nav className="flex items-center gap-3 sm:gap-4">
           {LINKS.map((link) => (
             <Link

@@ -1,4 +1,4 @@
-# An Niymah — Design Guidelines
+# Anniymah — Design Guidelines
 
 Hand this to Claude Code alongside the tech spec so design decisions don't need
 to be re-explained per session. These values are pulled directly from the
@@ -7,7 +7,7 @@ if anything here is ambiguous.
 
 ## Brand
 
-An Niymah sells a 4-in-1 perfume combo (Hawas Ice, Bleu de Chanel, Dior
+Anniymah sells a 4-in-1 perfume combo (Hawas Ice, Bleu de Chanel, Dior
 Sauvage, Vampire Blood) for ৳999 with free delivery, targeting customers in
 Dhaka via cash on delivery. The visual direction is clean and editorial —
 closer to a boutique showroom than the cluttered, discount-badge-heavy style

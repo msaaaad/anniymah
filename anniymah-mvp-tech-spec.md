@@ -1,4 +1,4 @@
-# An Niymah MVP — Tech Spec (Next.js + Supabase)
+# Anniymah MVP — Tech Spec (Next.js + Supabase)
 
 2026-09-18 · @Someone
 

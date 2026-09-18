@@ -16,7 +16,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "An Niymah",
+  title: "Anniymah",
   description: "৪-ইন-১ পারফিউম কম্বো — ঢাকার ভেতরে ফ্রি ডেলিভারি, ক্যাশ অন ডেলিভারি।",
 };
 

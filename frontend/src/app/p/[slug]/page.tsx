@@ -127,7 +127,7 @@ export default async function LandingPageBySlug({
       <footer className="site-footer">
         <div className="container">
           <div className="footer-bottom">
-            <span>© {new Date().getFullYear()} An Niymah. All rights reserved.</span>
+            <span>© {new Date().getFullYear()} Anniymah. All rights reserved.</span>
             {landing.phone && <span>Inbox or call: {landing.phone}</span>}
           </div>
         </div>

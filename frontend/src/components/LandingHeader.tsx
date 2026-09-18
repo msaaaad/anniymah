@@ -15,7 +15,7 @@ export function LandingHeader() {
     <header className="site-header">
       <div className="row">
         <a href="#top" className="brand">
-          <span className="name">An Niymah</span>
+          <span className="name">Anniymah</span>
           <span className="tag">premium perfume combo</span>
         </a>
         <nav className="main-nav">

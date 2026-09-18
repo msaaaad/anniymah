@@ -1,6 +1,7 @@
 import {
   MAX_COLLECTION_ITEMS,
   MAX_FEATURES,
+  MAX_SHIPPING_BAR_ITEMS,
   type CollectionItem,
   type FeatureItem,
 } from "@/lib/types";
@@ -20,4 +21,9 @@ export function parseFeatures(raw: unknown): FeatureItem[] {
     title: typeof item?.title === "string" ? item.title : "",
     description: typeof item?.description === "string" ? item.description : "",
   }));
+}
+
+export function parseShippingBarItems(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.slice(0, MAX_SHIPPING_BAR_ITEMS).map((item) => (typeof item === "string" ? item : ""));
 }

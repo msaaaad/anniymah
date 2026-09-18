@@ -52,17 +52,49 @@ input, select, textarea { font-size: 15px; }
 }
 .badge-trending { background: var(--rose); }
 
+/* ---------- Premium dark panel (hero + product collection) ----------
+   Full-bleed edge-to-edge, like the reference — reuses existing tokens
+   rather than inventing new colors: the dark base IS --text (already a
+   near-black warm brown), light content sits in --sage-tint (cream) and
+   --rose (ivory) — same palette, just inverted, so it stays "ours"
+   instead of borrowing the reference's navy. */
+section.section-premium {
+  position: relative; overflow: hidden;
+  background:
+    radial-gradient(1100px circle at 12% -10%, rgba(192, 81, 18, .4), transparent 55%),
+    radial-gradient(900px circle at 92% 105%, rgba(192, 81, 18, .28), transparent 50%),
+    var(--text);
+  color: var(--sage-tint);
+  padding: 64px 0;
+}
+.section-premium h1, .section-premium h2 { color: var(--rose); }
+
 /* ---------- Hero ---------- */
-.hero { padding: 64px 0 48px; }
 .hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 60px; align-items: center; }
-.eyebrow { color: var(--muted); font-size: 14px; margin-bottom: 14px; }
+.eyebrow { color: var(--sage-tint); opacity: .7; font-size: 14px; margin-bottom: 14px; }
 .hero h1 { font-size: 46px; line-height: 1.18; max-width: 520px; }
-.hero p.lead { margin-top: 20px; color: var(--muted); font-size: 16.5px; max-width: 440px; }
+.hero p.lead { margin-top: 20px; color: var(--sage-tint); opacity: .85; font-size: 16.5px; max-width: 440px; }
 .hero .btn { margin-top: 28px; }
 .hero-visual {
-  background: var(--surface); border-radius: 16px; height: 340px;
-  display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow);
+  border-radius: 16px; height: 340px;
+  display: flex; align-items: center; justify-content: center;
   overflow: hidden;
+}
+.hero-visual img { filter: drop-shadow(0 25px 40px rgba(0, 0, 0, .45)); }
+.hero-contact { margin-top: 16px; font-size: 13.5px; color: var(--sage-tint); opacity: .75; }
+.hero-contact a { color: var(--rose); font-weight: 600; }
+
+.price-row { display: flex; align-items: baseline; gap: 12px; margin-top: 18px; }
+.price-old { font-size: 16px; color: var(--sage-tint); opacity: .55; text-decoration: line-through; }
+.price-current { font-family: var(--font-heading), serif; font-size: 30px; font-weight: 600; color: var(--rose); }
+
+/* ---------- Floating hero image ---------- */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .floaty { animation: float 4.5s ease-in-out infinite; }
 }
 
 /* ---------- Sections ---------- */
@@ -89,16 +121,17 @@ input, select, textarea { font-size: 15px; }
 /* ---------- Product collection ---------- */
 .collection-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
 .collection-card {
-  background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden;
+  background: rgba(255, 255, 255, .06); border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 12px; overflow: hidden;
 }
 .collection-media {
-  aspect-ratio: 1 / 1; background: var(--media-bg);
+  aspect-ratio: 1 / 1; background: rgba(255, 255, 255, .04);
   display: flex; align-items: center; justify-content: center; overflow: hidden;
 }
 .collection-media img { width: 100%; height: 100%; object-fit: cover; }
 .collection-body { padding: 14px 16px; }
-.collection-body h3 { font-size: 14.5px; font-family: var(--font-body), sans-serif; font-weight: 600; }
-.collection-body p { margin-top: 3px; font-size: 13px; color: var(--muted); }
+.collection-body h3 { font-size: 14.5px; font-family: var(--font-body), sans-serif; font-weight: 600; color: var(--rose); }
+.collection-body p { margin-top: 3px; font-size: 13px; color: var(--sage-tint); opacity: .75; }
 @media (max-width: 880px) {
   .collection-grid { grid-template-columns: repeat(2, 1fr); }
 }
@@ -228,9 +261,7 @@ label.delivery-option {
   .sticky-cta { display: block; }
   .landing-body { padding-bottom: 74px; }
   .feature-grid { grid-template-columns: 1fr; }
-}
-@media (max-width: 520px) {
-  .collection-grid { grid-template-columns: 1fr; }
+  section.section-premium { padding: 40px 0; }
 }
 @media (max-width: 480px) {
   .field input, .field textarea { padding: 14px; font-size: 16px; }

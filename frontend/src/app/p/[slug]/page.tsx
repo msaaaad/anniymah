@@ -38,122 +38,135 @@ export default async function LandingPageBySlug({
 
   const collectionItems = landing.collectionItems.filter((item) => item.name.trim());
   const features = landing.features.filter((item) => item.title.trim());
-  const shippingItems = landing.shippingBarText
-    .split("\n")
-    .map((line) => line.trim())
-    .filter(Boolean);
+  const shippingItems = landing.shippingBarItems.map((item) => item.trim()).filter(Boolean);
 
   return (
     <div className="landing-body">
       <LandingHeader />
 
-      <main className="container" id="top">
-        <section className="hero">
-          <div className="hero-grid">
-            <div>
-              <p className="eyebrow">কম্বো অফার</p>
-              <h1>{landing.title}</h1>
-              <p className="lead">{landing.description}</p>
-              <a href="#order" className="btn btn-primary">
-                Order now
-              </a>
-              {landing.phone && (
-                <p style={{ marginTop: 16, fontSize: 13.5, color: "var(--muted)" }}>
-                  সরাসরি কথা বলতে চান? কল করুন —{" "}
-                  <a href={`tel:${landing.phone}`} style={{ color: "var(--sage-dark)", fontWeight: 600 }}>
-                    {landing.phone}
-                  </a>
-                </p>
-              )}
-            </div>
-            <div className="hero-visual">
-              {landing.imageUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element -- image lives in Supabase Storage, not a domain we control for next/image config
-                <img
-                  src={landing.imageUrl}
-                  alt={landing.title}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                />
-              ) : (
-                <span style={{ fontSize: 13, color: "var(--muted)" }}>প্রোডাক্ট ছবি শীঘ্রই যুক্ত হবে</span>
-              )}
+      <main id="top">
+        <section className="hero section-premium">
+          <div className="container">
+            <div className="hero-grid">
+              <div>
+                <p className="eyebrow">কম্বো অফার</p>
+                <h1>{landing.title}</h1>
+                <p className="lead">{landing.description}</p>
+                <div className="price-row">
+                  {landing.regularPrice > landing.price && (
+                    <span className="price-old">৳{landing.regularPrice}</span>
+                  )}
+                  <span className="price-current">৳{landing.price}</span>
+                </div>
+                <a href="#order" className="btn btn-primary">
+                  Order now
+                </a>
+                {landing.phone && (
+                  <p className="hero-contact">
+                    সরাসরি কথা বলতে চান? কল করুন —{" "}
+                    <a href={`tel:${landing.phone}`}>{landing.phone}</a>
+                  </p>
+                )}
+              </div>
+              <div className="hero-visual floaty">
+                {landing.imageUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- image lives in Supabase Storage, not a domain we control for next/image config
+                  <img
+                    src={landing.imageUrl}
+                    alt={landing.title}
+                    style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                  />
+                ) : (
+                  <span style={{ fontSize: 13, color: "var(--sage-tint)", opacity: 0.6 }}>প্রোডাক্ট ছবি শীঘ্রই যুক্ত হবে</span>
+                )}
+              </div>
             </div>
           </div>
         </section>
 
         {landing.featuresEnabled && features.length > 0 && (
           <section className="section" id="features">
-            <div className="section-head stack">
-              <h2>{landing.featuresTitle}</h2>
-              {landing.featuresSubtitle && <p>{landing.featuresSubtitle}</p>}
-            </div>
-            <div className="feature-grid">
-              {features.map((feature, i) => (
-                <div className="feature-card" key={feature.title}>
-                  <div className="feature-icon">{FEATURE_ICONS[i % FEATURE_ICONS.length]}</div>
-                  <div>
-                    <h3>{feature.title}</h3>
-                    {feature.description && <p>{feature.description}</p>}
+            <div className="container">
+              <div className="section-head stack">
+                <h2>{landing.featuresTitle}</h2>
+                {landing.featuresSubtitle && <p>{landing.featuresSubtitle}</p>}
+              </div>
+              <div className="feature-grid">
+                {features.map((feature, i) => (
+                  <div className="feature-card" key={feature.title}>
+                    <div className="feature-icon">{FEATURE_ICONS[i % FEATURE_ICONS.length]}</div>
+                    <div>
+                      <h3>{feature.title}</h3>
+                      {feature.description && <p>{feature.description}</p>}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </section>
         )}
 
         {landing.collectionEnabled && collectionItems.length > 0 && (
-          <section className="section" id="inside">
-            <div className="section-head">
-              <h2>{landing.collectionTitle}</h2>
-            </div>
-            <div className="collection-grid">
-              {collectionItems.map((item) => (
-                <div className="collection-card" key={item.name}>
-                  <div className="collection-media">
-                    {item.imageUrl ? (
-                      // eslint-disable-next-line @next/next/no-img-element -- image lives in Supabase Storage, not a domain we control for next/image config
-                      <img src={item.imageUrl} alt={item.name} />
-                    ) : (
-                      <span style={{ fontSize: 12, color: "var(--muted)" }}>ছবি নেই</span>
-                    )}
+          <section className="section section-premium" id="inside">
+            <div className="container">
+              <div className="section-head">
+                <h2>{landing.collectionTitle}</h2>
+              </div>
+              <div className="collection-grid">
+                {collectionItems.map((item) => (
+                  <div className="collection-card" key={item.name}>
+                    <div className="collection-media">
+                      {item.imageUrl ? (
+                        // eslint-disable-next-line @next/next/no-img-element -- image lives in Supabase Storage, not a domain we control for next/image config
+                        <img src={item.imageUrl} alt={item.name} />
+                      ) : (
+                        <span style={{ fontSize: 12, color: "var(--sage-tint)", opacity: 0.6 }}>ছবি নেই</span>
+                      )}
+                    </div>
+                    <div className="collection-body">
+                      <h3>{item.name}</h3>
+                      {item.description && <p>{item.description}</p>}
+                    </div>
                   </div>
-                  <div className="collection-body">
-                    <h3>{item.name}</h3>
-                    {item.description && <p>{item.description}</p>}
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </section>
         )}
 
         {landing.shippingBarEnabled && shippingItems.length > 0 && (
-          <section className="shipping-bar">
-            {shippingItems.map((item) => (
-              <span key={item} className="shipping-bar-item">
-                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                  <path d="M20 6 9 17l-5-5" />
-                </svg>
-                {item}
-              </span>
-            ))}
+          <section>
+            <div className="container">
+              <div className="shipping-bar">
+                {shippingItems.map((item) => (
+                  <span key={item} className="shipping-bar-item">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
           </section>
         )}
 
         <section className="section" id="order-section-wrap">
-          <div className="section-head">
-            <h2>Place your order</h2>
+          <div className="container">
+            <div className="section-head">
+              <h2>Place your order</h2>
+            </div>
+            <p style={{ color: "var(--muted)", fontSize: 14.5, marginBottom: 24, maxWidth: 520 }}>
+              নিচের ফর্মটি পূরণ করে Confirm করুন — আপনার অর্ডারটি সরাসরি আমাদের কাছে চলে যাবে। ক্যাশ অন ডেলিভারিতে পেমেন্ট করবেন।
+            </p>
+            <OrderForm
+              landingPageId={landing.id}
+              price={landing.price}
+              freeDelivery={landing.freeDelivery}
+              deliveryChargeInsideDhaka={landing.deliveryChargeInsideDhaka}
+              deliveryChargeOutsideDhaka={landing.deliveryChargeOutsideDhaka}
+            />
           </div>
-          <p style={{ color: "var(--muted)", fontSize: 14.5, marginBottom: 24, maxWidth: 520 }}>
-            নিচের ফর্মটি পূরণ করে Confirm করুন — আপনার অর্ডারটি সরাসরি আমাদের কাছে চলে যাবে। ক্যাশ অন ডেলিভারিতে পেমেন্ট করবেন।
-          </p>
-          <OrderForm
-            landingPageId={landing.id}
-            price={landing.price}
-            freeDelivery={landing.freeDelivery}
-            deliveryChargeInsideDhaka={landing.deliveryChargeInsideDhaka}
-            deliveryChargeOutsideDhaka={landing.deliveryChargeOutsideDhaka}
-          />
         </section>
       </main>
 

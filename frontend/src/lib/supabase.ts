@@ -13,6 +13,7 @@ type LandingPageRow = {
   title: string;
   description: string;
   price: number;
+  regular_price: number;
   phone: string;
   image_url: string;
   collection_enabled: boolean;
@@ -23,7 +24,7 @@ type LandingPageRow = {
   features_subtitle: string;
   features: FeatureItem[];
   shipping_bar_enabled: boolean;
-  shipping_bar_text: string;
+  shipping_bar_items: string[];
   free_delivery: boolean;
   delivery_charge_inside_dhaka: number;
   delivery_charge_outside_dhaka: number;

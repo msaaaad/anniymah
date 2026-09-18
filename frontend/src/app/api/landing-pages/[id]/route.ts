@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { deleteLandingPage, getLandingPageById, updateLandingPage } from "@/lib/db";
-import { parseCollectionItems, parseFeatures } from "@/lib/sections";
+import { parseCollectionItems, parseFeatures, parseShippingBarItems } from "@/lib/sections";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/session";
 import { isValidSlug } from "@/lib/slug";
 
@@ -49,6 +49,7 @@ export async function PUT(
       title: String(body.title ?? ""),
       description: String(body.description ?? ""),
       price: Number(body.price) || 0,
+      regularPrice: Math.max(0, Number(body.regularPrice) || 0),
       phone: String(body.phone ?? ""),
       imageUrl: String(body.imageUrl ?? ""),
       collectionEnabled: Boolean(body.collectionEnabled),
@@ -59,7 +60,7 @@ export async function PUT(
       featuresSubtitle: String(body.featuresSubtitle ?? ""),
       features: parseFeatures(body.features),
       shippingBarEnabled: Boolean(body.shippingBarEnabled),
-      shippingBarText: String(body.shippingBarText ?? ""),
+      shippingBarItems: parseShippingBarItems(body.shippingBarItems),
       freeDelivery: body.freeDelivery !== false,
       deliveryChargeInsideDhaka: Math.max(0, Number(body.deliveryChargeInsideDhaka) || 0),
       deliveryChargeOutsideDhaka: Math.max(0, Number(body.deliveryChargeOutsideDhaka) || 0),

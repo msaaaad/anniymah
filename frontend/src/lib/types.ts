@@ -2,8 +2,9 @@ export type OrderStatus = "pending" | "confirmed" | "delivered" | "cancelled" | 
 export type DeliveryZone = "inside_dhaka" | "outside_dhaka";
 
 export const MAX_LANDING_PAGES = 4;
-export const MAX_COLLECTION_ITEMS = 4;
+export const MAX_COLLECTION_ITEMS = 8;
 export const MAX_FEATURES = 4;
+export const MAX_SHIPPING_BAR_ITEMS = 6;
 
 export interface CollectionItem {
   name: string;
@@ -22,6 +23,7 @@ export interface LandingPage {
   title: string;
   description: string;
   price: number;
+  regularPrice: number;
   phone: string;
   imageUrl: string;
   collectionEnabled: boolean;
@@ -32,7 +34,7 @@ export interface LandingPage {
   featuresSubtitle: string;
   features: FeatureItem[];
   shippingBarEnabled: boolean;
-  shippingBarText: string;
+  shippingBarItems: string[];
   freeDelivery: boolean;
   deliveryChargeInsideDhaka: number;
   deliveryChargeOutsideDhaka: number;

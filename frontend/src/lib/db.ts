@@ -23,6 +23,7 @@ interface LandingPageRow {
   title: string;
   description: string;
   price: number;
+  regular_price: number;
   phone: string;
   image_url: string;
   collection_enabled: boolean;
@@ -33,7 +34,7 @@ interface LandingPageRow {
   features_subtitle: string;
   features: FeatureItem[];
   shipping_bar_enabled: boolean;
-  shipping_bar_text: string;
+  shipping_bar_items: string[];
   free_delivery: boolean;
   delivery_charge_inside_dhaka: number;
   delivery_charge_outside_dhaka: number;
@@ -66,6 +67,7 @@ function toLandingPage(row: LandingPageRow): LandingPage {
     title: row.title,
     description: row.description,
     price: row.price,
+    regularPrice: row.regular_price,
     phone: row.phone,
     imageUrl: row.image_url,
     collectionEnabled: row.collection_enabled,
@@ -76,7 +78,7 @@ function toLandingPage(row: LandingPageRow): LandingPage {
     featuresSubtitle: row.features_subtitle,
     features: row.features,
     shippingBarEnabled: row.shipping_bar_enabled,
-    shippingBarText: row.shipping_bar_text,
+    shippingBarItems: row.shipping_bar_items,
     freeDelivery: row.free_delivery,
     deliveryChargeInsideDhaka: row.delivery_charge_inside_dhaka,
     deliveryChargeOutsideDhaka: row.delivery_charge_outside_dhaka,
@@ -143,6 +145,7 @@ function toRowPatch(patch: Partial<LandingPageInput>) {
     ...(patch.title !== undefined && { title: patch.title }),
     ...(patch.description !== undefined && { description: patch.description }),
     ...(patch.price !== undefined && { price: patch.price }),
+    ...(patch.regularPrice !== undefined && { regular_price: patch.regularPrice }),
     ...(patch.phone !== undefined && { phone: patch.phone }),
     ...(patch.imageUrl !== undefined && { image_url: patch.imageUrl }),
     ...(patch.collectionEnabled !== undefined && { collection_enabled: patch.collectionEnabled }),
@@ -153,7 +156,7 @@ function toRowPatch(patch: Partial<LandingPageInput>) {
     ...(patch.featuresSubtitle !== undefined && { features_subtitle: patch.featuresSubtitle }),
     ...(patch.features !== undefined && { features: patch.features }),
     ...(patch.shippingBarEnabled !== undefined && { shipping_bar_enabled: patch.shippingBarEnabled }),
-    ...(patch.shippingBarText !== undefined && { shipping_bar_text: patch.shippingBarText }),
+    ...(patch.shippingBarItems !== undefined && { shipping_bar_items: patch.shippingBarItems }),
     ...(patch.freeDelivery !== undefined && { free_delivery: patch.freeDelivery }),
     ...(patch.deliveryChargeInsideDhaka !== undefined && {
       delivery_charge_inside_dhaka: patch.deliveryChargeInsideDhaka,
@@ -179,6 +182,7 @@ export async function createLandingPage(input: LandingPageInput): Promise<Landin
       title: input.title,
       description: input.description,
       price: input.price,
+      regular_price: input.regularPrice,
       phone: input.phone,
       image_url: input.imageUrl,
       collection_enabled: input.collectionEnabled,
@@ -189,7 +193,7 @@ export async function createLandingPage(input: LandingPageInput): Promise<Landin
       features_subtitle: input.featuresSubtitle,
       features: input.features,
       shipping_bar_enabled: input.shippingBarEnabled,
-      shipping_bar_text: input.shippingBarText,
+      shipping_bar_items: input.shippingBarItems,
       free_delivery: input.freeDelivery,
       delivery_charge_inside_dhaka: input.deliveryChargeInsideDhaka,
       delivery_charge_outside_dhaka: input.deliveryChargeOutsideDhaka,

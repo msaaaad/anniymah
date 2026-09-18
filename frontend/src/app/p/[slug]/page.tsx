@@ -6,16 +6,26 @@ import "../../landing.css";
 
 export const dynamic = "force-dynamic";
 
-const ICON_COLORS = ["var(--sage)", "var(--text)", "var(--rose)", "var(--muted)"];
-
-function BottleIcon({ color }: { color: string }) {
-  return (
-    <svg viewBox="0 0 64 64" width="26" height="26" fill="none" stroke={color} strokeWidth="4">
-      <rect x="24" y="20" width="16" height="30" rx="2" />
-      <rect x="27" y="12" width="10" height="9" rx="2" />
-    </svg>
-  );
-}
+const FEATURE_ICONS = [
+  // Droplet — volume/size
+  <svg key="drop" viewBox="0 0 64 64" width="28" height="28" fill="none" stroke="var(--sage-dark)" strokeWidth="3">
+    <path d="M32 10c0 0-15 19-15 30a15 15 0 0 0 30 0c0-11-15-30-15-30Z" />
+  </svg>,
+  // Clock — longevity
+  <svg key="clock" viewBox="0 0 64 64" width="28" height="28" fill="none" stroke="var(--sage-dark)" strokeWidth="3">
+    <circle cx="32" cy="32" r="21" />
+    <path d="M32 20v12l9 9" strokeLinecap="round" />
+  </svg>,
+  // Box — packaging
+  <svg key="box" viewBox="0 0 64 64" width="28" height="28" fill="none" stroke="var(--sage-dark)" strokeWidth="3">
+    <rect x="11" y="25" width="42" height="27" rx="2" />
+    <path d="M11 34h42M32 25v27M22 25l6-9h8l6 9" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>,
+  // Star — quality
+  <svg key="star" viewBox="0 0 64 64" width="28" height="28" fill="var(--sage-dark)" stroke="none">
+    <path d="M32 8l7.5 16.5L57 27l-13 12.5L47.5 57 32 47.5 16.5 57 20 39.5 7 27l17.5-2.5Z" />
+  </svg>,
+];
 
 export default async function LandingPageBySlug({
   params,
@@ -26,7 +36,9 @@ export default async function LandingPageBySlug({
   const landing = await getLandingPageBySlug(slug);
   if (!landing) notFound();
 
-  const part2Items = landing.part2Text
+  const collectionItems = landing.collectionItems.filter((item) => item.name.trim());
+  const features = landing.features.filter((item) => item.title.trim());
+  const shippingItems = landing.shippingBarText
     .split("\n")
     .map((line) => line.trim())
     .filter(Boolean);
@@ -69,35 +81,62 @@ export default async function LandingPageBySlug({
           </div>
         </section>
 
-        {landing.part2Enabled && (
+        {landing.featuresEnabled && features.length > 0 && (
+          <section className="section" id="features">
+            <div className="section-head stack">
+              <h2>{landing.featuresTitle}</h2>
+              {landing.featuresSubtitle && <p>{landing.featuresSubtitle}</p>}
+            </div>
+            <div className="feature-grid">
+              {features.map((feature, i) => (
+                <div className="feature-card" key={feature.title}>
+                  <div className="feature-icon">{FEATURE_ICONS[i % FEATURE_ICONS.length]}</div>
+                  <div>
+                    <h3>{feature.title}</h3>
+                    {feature.description && <p>{feature.description}</p>}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {landing.collectionEnabled && collectionItems.length > 0 && (
           <section className="section" id="inside">
             <div className="section-head">
-              <h2>{landing.part2Title}</h2>
+              <h2>{landing.collectionTitle}</h2>
             </div>
-            <div className="inside-grid">
-              <div className="pdp-media" style={{ height: "auto", overflow: "hidden" }}>
-                {landing.part2ImageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- image lives in Supabase Storage, not a domain we control for next/image config
-                  <img
-                    src={landing.part2ImageUrl}
-                    alt={landing.part2Title}
-                    style={{ width: "100%", display: "block" }}
-                  />
-                ) : (
-                  <span style={{ fontSize: 13, color: "var(--muted)", padding: 40 }}>ছবি শীঘ্রই যুক্ত হবে</span>
-                )}
-              </div>
-              <div className="inside-list">
-                {part2Items.map((item, i) => (
-                  <div className="inside-item" key={item}>
-                    <div className="inside-icon">
-                      <BottleIcon color={ICON_COLORS[i % ICON_COLORS.length]} />
-                    </div>
-                    <span>{item}</span>
+            <div className="collection-grid">
+              {collectionItems.map((item) => (
+                <div className="collection-card" key={item.name}>
+                  <div className="collection-media">
+                    {item.imageUrl ? (
+                      // eslint-disable-next-line @next/next/no-img-element -- image lives in Supabase Storage, not a domain we control for next/image config
+                      <img src={item.imageUrl} alt={item.name} />
+                    ) : (
+                      <span style={{ fontSize: 12, color: "var(--muted)" }}>ছবি নেই</span>
+                    )}
                   </div>
-                ))}
-              </div>
+                  <div className="collection-body">
+                    <h3>{item.name}</h3>
+                    {item.description && <p>{item.description}</p>}
+                  </div>
+                </div>
+              ))}
             </div>
+          </section>
+        )}
+
+        {landing.shippingBarEnabled && shippingItems.length > 0 && (
+          <section className="shipping-bar">
+            {shippingItems.map((item) => (
+              <span key={item} className="shipping-bar-item">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <path d="M20 6 9 17l-5-5" />
+                </svg>
+                {item}
+              </span>
+            ))}
           </section>
         )}
 

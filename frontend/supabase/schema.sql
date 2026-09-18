@@ -18,10 +18,15 @@ create table landing_pages (
   price integer not null default 0,
   phone text not null default '',
   image_url text not null default '',
-  part2_enabled boolean not null default false,
-  part2_title text not null default '',
-  part2_text text not null default '',
-  part2_image_url text not null default '',
+  collection_enabled boolean not null default false,
+  collection_title text not null default '',
+  collection_items jsonb not null default '[]'::jsonb,
+  features_enabled boolean not null default false,
+  features_title text not null default '',
+  features_subtitle text not null default '',
+  features jsonb not null default '[]'::jsonb,
+  shipping_bar_enabled boolean not null default false,
+  shipping_bar_text text not null default '',
   free_delivery boolean not null default true,
   delivery_charge_inside_dhaka integer not null default 0,
   delivery_charge_outside_dhaka integer not null default 0,
@@ -29,7 +34,7 @@ create table landing_pages (
   updated_at timestamptz not null default now()
 );
 
-insert into landing_pages (slug, title, description, price, phone, image_url, part2_enabled, part2_title, part2_text, part2_image_url)
+insert into landing_pages (slug, title, description, price, phone, image_url, collection_enabled, collection_title)
 values (
   'combo-offer',
   '৪টি জনপ্রিয় পারফিউম, এক কম্বোতে — মাত্র ৳999',
@@ -38,9 +43,7 @@ values (
   '01614-150325',
   '',
   true,
-  'কম্বোতে যা থাকছে',
-  E'Hawas Ice — For Him\nDior Sauvage\nVampire Blood\nBleu de Chanel',
-  ''
+  'কম্বোতে যা থাকছে'
 );
 
 alter table landing_pages enable row level security;

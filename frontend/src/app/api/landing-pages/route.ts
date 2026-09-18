@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createLandingPage, LandingPageLimitError, listLandingPages } from "@/lib/db";
+import { parseCollectionItems, parseFeatures } from "@/lib/sections";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/session";
 import { isValidSlug } from "@/lib/slug";
 
@@ -35,10 +36,15 @@ export async function POST(request: NextRequest) {
       price: Number(body.price) || 0,
       phone: String(body.phone ?? ""),
       imageUrl: String(body.imageUrl ?? ""),
-      part2Enabled: Boolean(body.part2Enabled),
-      part2Title: String(body.part2Title ?? ""),
-      part2Text: String(body.part2Text ?? ""),
-      part2ImageUrl: String(body.part2ImageUrl ?? ""),
+      collectionEnabled: Boolean(body.collectionEnabled),
+      collectionTitle: String(body.collectionTitle ?? ""),
+      collectionItems: parseCollectionItems(body.collectionItems),
+      featuresEnabled: Boolean(body.featuresEnabled),
+      featuresTitle: String(body.featuresTitle ?? ""),
+      featuresSubtitle: String(body.featuresSubtitle ?? ""),
+      features: parseFeatures(body.features),
+      shippingBarEnabled: Boolean(body.shippingBarEnabled),
+      shippingBarText: String(body.shippingBarText ?? ""),
       freeDelivery: body.freeDelivery !== false,
       deliveryChargeInsideDhaka: Math.max(0, Number(body.deliveryChargeInsideDhaka) || 0),
       deliveryChargeOutsideDhaka: Math.max(0, Number(body.deliveryChargeOutsideDhaka) || 0),

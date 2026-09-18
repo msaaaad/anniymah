@@ -2,7 +2,9 @@ import { getSupabaseAdmin } from "@/lib/supabase";
 import { deleteStorageImageIfOwned } from "@/lib/storage";
 import {
   MAX_LANDING_PAGES,
+  type CollectionItem,
   type DeliveryZone,
+  type FeatureItem,
   type LandingPage,
   type Order,
   type OrderStatus,
@@ -23,10 +25,15 @@ interface LandingPageRow {
   price: number;
   phone: string;
   image_url: string;
-  part2_enabled: boolean;
-  part2_title: string;
-  part2_text: string;
-  part2_image_url: string;
+  collection_enabled: boolean;
+  collection_title: string;
+  collection_items: CollectionItem[];
+  features_enabled: boolean;
+  features_title: string;
+  features_subtitle: string;
+  features: FeatureItem[];
+  shipping_bar_enabled: boolean;
+  shipping_bar_text: string;
   free_delivery: boolean;
   delivery_charge_inside_dhaka: number;
   delivery_charge_outside_dhaka: number;
@@ -61,10 +68,15 @@ function toLandingPage(row: LandingPageRow): LandingPage {
     price: row.price,
     phone: row.phone,
     imageUrl: row.image_url,
-    part2Enabled: row.part2_enabled,
-    part2Title: row.part2_title,
-    part2Text: row.part2_text,
-    part2ImageUrl: row.part2_image_url,
+    collectionEnabled: row.collection_enabled,
+    collectionTitle: row.collection_title,
+    collectionItems: row.collection_items,
+    featuresEnabled: row.features_enabled,
+    featuresTitle: row.features_title,
+    featuresSubtitle: row.features_subtitle,
+    features: row.features,
+    shippingBarEnabled: row.shipping_bar_enabled,
+    shippingBarText: row.shipping_bar_text,
     freeDelivery: row.free_delivery,
     deliveryChargeInsideDhaka: row.delivery_charge_inside_dhaka,
     deliveryChargeOutsideDhaka: row.delivery_charge_outside_dhaka,
@@ -133,10 +145,15 @@ function toRowPatch(patch: Partial<LandingPageInput>) {
     ...(patch.price !== undefined && { price: patch.price }),
     ...(patch.phone !== undefined && { phone: patch.phone }),
     ...(patch.imageUrl !== undefined && { image_url: patch.imageUrl }),
-    ...(patch.part2Enabled !== undefined && { part2_enabled: patch.part2Enabled }),
-    ...(patch.part2Title !== undefined && { part2_title: patch.part2Title }),
-    ...(patch.part2Text !== undefined && { part2_text: patch.part2Text }),
-    ...(patch.part2ImageUrl !== undefined && { part2_image_url: patch.part2ImageUrl }),
+    ...(patch.collectionEnabled !== undefined && { collection_enabled: patch.collectionEnabled }),
+    ...(patch.collectionTitle !== undefined && { collection_title: patch.collectionTitle }),
+    ...(patch.collectionItems !== undefined && { collection_items: patch.collectionItems }),
+    ...(patch.featuresEnabled !== undefined && { features_enabled: patch.featuresEnabled }),
+    ...(patch.featuresTitle !== undefined && { features_title: patch.featuresTitle }),
+    ...(patch.featuresSubtitle !== undefined && { features_subtitle: patch.featuresSubtitle }),
+    ...(patch.features !== undefined && { features: patch.features }),
+    ...(patch.shippingBarEnabled !== undefined && { shipping_bar_enabled: patch.shippingBarEnabled }),
+    ...(patch.shippingBarText !== undefined && { shipping_bar_text: patch.shippingBarText }),
     ...(patch.freeDelivery !== undefined && { free_delivery: patch.freeDelivery }),
     ...(patch.deliveryChargeInsideDhaka !== undefined && {
       delivery_charge_inside_dhaka: patch.deliveryChargeInsideDhaka,
@@ -164,10 +181,15 @@ export async function createLandingPage(input: LandingPageInput): Promise<Landin
       price: input.price,
       phone: input.phone,
       image_url: input.imageUrl,
-      part2_enabled: input.part2Enabled,
-      part2_title: input.part2Title,
-      part2_text: input.part2Text,
-      part2_image_url: input.part2ImageUrl,
+      collection_enabled: input.collectionEnabled,
+      collection_title: input.collectionTitle,
+      collection_items: input.collectionItems,
+      features_enabled: input.featuresEnabled,
+      features_title: input.featuresTitle,
+      features_subtitle: input.featuresSubtitle,
+      features: input.features,
+      shipping_bar_enabled: input.shippingBarEnabled,
+      shipping_bar_text: input.shippingBarText,
       free_delivery: input.freeDelivery,
       delivery_charge_inside_dhaka: input.deliveryChargeInsideDhaka,
       delivery_charge_outside_dhaka: input.deliveryChargeOutsideDhaka,
@@ -200,8 +222,10 @@ export async function updateLandingPage(
     if (patch.imageUrl !== undefined && patch.imageUrl !== existing.imageUrl) {
       await deleteStorageImageIfOwned(existing.imageUrl);
     }
-    if (patch.part2ImageUrl !== undefined && patch.part2ImageUrl !== existing.part2ImageUrl) {
-      await deleteStorageImageIfOwned(existing.part2ImageUrl);
+    if (patch.collectionItems !== undefined) {
+      const newUrls = new Set(patch.collectionItems.map((item) => item.imageUrl));
+      const removed = existing.collectionItems.filter((item) => !newUrls.has(item.imageUrl));
+      await Promise.all(removed.map((item) => deleteStorageImageIfOwned(item.imageUrl)));
     }
   }
 
@@ -216,7 +240,7 @@ export async function deleteLandingPage(id: string): Promise<void> {
 
   if (existing) {
     await deleteStorageImageIfOwned(existing.imageUrl);
-    await deleteStorageImageIfOwned(existing.part2ImageUrl);
+    await Promise.all(existing.collectionItems.map((item) => deleteStorageImageIfOwned(item.imageUrl)));
   }
 }
 

@@ -64,10 +64,21 @@ section.section-premium {
     radial-gradient(1100px circle at 12% -10%, rgba(192, 81, 18, .4), transparent 55%),
     radial-gradient(900px circle at 92% 105%, rgba(192, 81, 18, .28), transparent 50%),
     var(--text);
+  background-size: 180% 180%;
   color: var(--sage-tint);
   padding: 64px 0;
 }
 .section-premium h1, .section-premium h2 { color: var(--rose); }
+
+/* EXPERIMENTAL — local-only per request, not yet approved to ship.
+   Slowly drifts the glow left-to-right and back, like a slow wave. */
+@keyframes wave-glow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  section.section-premium { animation: wave-glow 16s ease-in-out infinite; }
+}
 
 /* ---------- Hero ---------- */
 .hero-grid { display: grid; grid-template-columns: 1.05fr .95fr; gap: 60px; align-items: center; }
@@ -262,6 +273,11 @@ label.delivery-option {
   .landing-body { padding-bottom: 74px; }
   .feature-grid { grid-template-columns: 1fr; }
   section.section-premium { padding: 40px 0; }
+}
+@media (max-width: 600px) {
+  /* Individually-centered wrapped items look ragged once they can only fit
+     one per line — switch to a clean left-aligned stack instead. */
+  .shipping-bar { flex-direction: column; align-items: flex-start; padding: 18px 22px; gap: 13px; }
 }
 @media (max-width: 480px) {
   .field input, .field textarea { padding: 14px; font-size: 16px; }

@@ -2,6 +2,7 @@
 
 import { FormEvent, ReactNode, useState } from "react";
 import { ImageUploader } from "@/components/ImageUploader";
+import { useToast } from "@/components/Toast";
 import {
   MAX_COLLECTION_ITEMS,
   MAX_FEATURES,
@@ -64,6 +65,7 @@ export function LandingPageForm({ initial, submitLabel, onSubmit, headerActions 
   });
   const [saveState, setSaveState] = useState<SaveState>("idle");
   const [error, setError] = useState("");
+  const { showToast } = useToast();
 
   function update<K extends keyof LandingPageFormValues>(key: K, value: LandingPageFormValues[K]) {
     setValues((prev) => ({ ...prev, [key]: value }));
@@ -124,9 +126,11 @@ export function LandingPageForm({ initial, submitLabel, onSubmit, headerActions 
     if (errorMessage) {
       setError(errorMessage);
       setSaveState("error");
+      showToast(errorMessage, "error");
       return;
     }
     setSaveState("saved");
+    showToast("Page saved", "success");
     setTimeout(() => setSaveState("idle"), 2000);
   }
 

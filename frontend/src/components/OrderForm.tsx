@@ -2,6 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { isValidBangladeshiPhone } from "@/lib/phone";
+import { useToast } from "@/components/Toast";
 import type { DeliveryZone } from "@/lib/types";
 
 interface OrderFormProps {
@@ -26,6 +27,7 @@ export function OrderForm({
   const [state, setState] = useState<SubmitState>("idle");
   const [message, setMessage] = useState("");
   const [phoneError, setPhoneError] = useState("");
+  const { showToast } = useToast();
 
   const deliveryCharge = freeDelivery
     ? 0
@@ -69,13 +71,17 @@ export function OrderForm({
         const body = await res.json().catch(() => ({}));
         throw new Error(body.error || "অর্ডার সাবমিট করা যায়নি, আবার চেষ্টা করুন।");
       }
-      setMessage("অর্ডার কনফার্ম হয়েছে! আমরা শীঘ্রই যোগাযোগ করব।");
+      const successMessage = "অর্ডার কনফার্ম হয়েছে! আমরা শীঘ্রই যোগাযোগ করব।";
+      setMessage(successMessage);
       setState("success");
+      showToast(successMessage, "success");
       form.reset();
       setQuantity(1);
     } catch (err) {
-      setMessage(err instanceof Error ? err.message : "কিছু একটা সমস্যা হয়েছে।");
+      const errorMessage = err instanceof Error ? err.message : "কিছু একটা সমস্যা হয়েছে।";
+      setMessage(errorMessage);
       setState("error");
+      showToast(errorMessage, "error");
     }
   }
 

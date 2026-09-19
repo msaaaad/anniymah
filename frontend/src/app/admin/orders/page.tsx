@@ -161,10 +161,10 @@ export default function AdminOrdersPage() {
                             : setConfirmDeleteId(order.id)
                         }
                         onBlur={() => setConfirmDeleteId((id) => (id === order.id ? null : id))}
-                        className={`ml-auto rounded-[8px] border px-4 py-2 text-sm font-medium transition-colors ${
+                        className={`ml-auto rounded-[8px] border px-4 py-2 text-sm font-semibold text-white transition-colors ${
                           confirmDeleteId === order.id
-                            ? "border-rose-dark bg-rose-dark text-white"
-                            : "border-border text-rose-dark hover:border-rose-dark hover:bg-rose-tint"
+                            ? "border-danger-dark bg-danger-dark"
+                            : "border-danger bg-danger hover:bg-danger-dark hover:border-danger-dark"
                         }`}
                       >
                         {confirmDeleteId === order.id ? "Click again to confirm" : "Delete"}

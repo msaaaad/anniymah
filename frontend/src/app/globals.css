@@ -14,6 +14,11 @@
   --border: #EFE0CF;
   --media-bg: #F3E2D3;
   --shadow: 0 1px 2px rgba(43, 33, 26, .04), 0 6px 20px rgba(43, 33, 26, .05);
+  /* True red for destructive actions — --rose is a soft decorative tan,
+     not enough contrast for "this deletes something" */
+  --danger: #DC2626;
+  --danger-dark: #B91C1C;
+  --danger-tint: #FEE2E2;
 }
 
 @theme inline {
@@ -29,6 +34,9 @@
   --color-muted: var(--muted);
   --color-border: var(--border);
   --color-media-bg: var(--media-bg);
+  --color-danger: var(--danger);
+  --color-danger-dark: var(--danger-dark);
+  --color-danger-tint: var(--danger-tint);
   --font-heading: var(--font-fraunces);
   --font-body: var(--font-inter);
 }

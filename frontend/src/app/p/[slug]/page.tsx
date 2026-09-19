@@ -161,6 +161,7 @@ export default async function LandingPageBySlug({
             </p>
             <OrderForm
               landingPageId={landing.id}
+              slug={slug}
               price={landing.price}
               freeDelivery={landing.freeDelivery}
               deliveryChargeInsideDhaka={landing.deliveryChargeInsideDhaka}

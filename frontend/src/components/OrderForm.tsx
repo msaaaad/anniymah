@@ -1,33 +1,36 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { isValidBangladeshiPhone } from "@/lib/phone";
-import { useToast } from "@/components/Toast";
 import type { DeliveryZone } from "@/lib/types";
 
 interface OrderFormProps {
   landingPageId: string;
+  slug: string;
   price: number;
   freeDelivery: boolean;
   deliveryChargeInsideDhaka: number;
   deliveryChargeOutsideDhaka: number;
 }
 
-type SubmitState = "idle" | "submitting" | "success" | "error";
+type SubmitState = "idle" | "submitting" | "error";
 
 export function OrderForm({
   landingPageId,
+  slug,
   price,
   freeDelivery,
   deliveryChargeInsideDhaka,
   deliveryChargeOutsideDhaka,
 }: OrderFormProps) {
+  const router = useRouter();
   const [quantity, setQuantity] = useState(1);
   const [deliveryZone, setDeliveryZone] = useState<DeliveryZone>("inside_dhaka");
   const [state, setState] = useState<SubmitState>("idle");
   const [message, setMessage] = useState("");
   const [phoneError, setPhoneError] = useState("");
-  const { showToast } = useToast();
 
   const deliveryCharge = freeDelivery
     ? 0
@@ -71,17 +74,16 @@ export function OrderForm({
         const body = await res.json().catch(() => ({}));
         throw new Error(body.error || "অর্ডার সাবমিট করা যায়নি, আবার চেষ্টা করুন।");
       }
-      const successMessage = "অর্ডার কনফার্ম হয়েছে! আমরা শীঘ্রই যোগাযোগ করব।";
-      setMessage(successMessage);
-      setState("success");
-      showToast(successMessage, "success");
-      form.reset();
-      setQuantity(1);
+      const params = new URLSearchParams({
+        name: String(payload.customerName ?? ""),
+        total: String(total),
+      });
+      router.push(`/p/${slug}/thank-you?${params.toString()}`);
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : "কিছু একটা সমস্যা হয়েছে।";
       setMessage(errorMessage);
       setState("error");
-      showToast(errorMessage, "error");
+      toast.error(errorMessage);
     }
   }
 
@@ -219,18 +221,12 @@ export function OrderForm({
             </span>
           </div>
 
-          {(state === "success" || state === "error") && (
-            <div className={`order-status show ${state === "success" ? "success" : "error"}`}>
-              {state === "success" ? (
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                  <path d="M20 6 9 17l-5-5" />
-                </svg>
-              ) : (
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                  <circle cx="12" cy="12" r="9" />
-                  <path d="M12 8v5M12 16h.01" />
-                </svg>
-              )}
+          {state === "error" && (
+            <div className="order-status show error">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 8v5M12 16h.01" />
+              </svg>
               <span>{message}</span>
             </div>
           )}

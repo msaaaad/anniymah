@@ -229,7 +229,6 @@ label.delivery-option {
   border-radius: 8px; font-size: 13.5px; font-weight: 600;
 }
 .order-status.show { display: flex; }
-.order-status.success { background: var(--sage-tint); color: var(--sage-dark); }
 .order-status.error { background: var(--rose-tint); color: var(--rose-dark); }
 .order-status svg { width: 18px; height: 18px; flex-shrink: 0; }
 
@@ -259,6 +258,57 @@ label.delivery-option {
   display: none; position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
   background: var(--surface); border-top: 1px solid var(--border);
   padding: 12px 20px; box-shadow: 0 -6px 20px rgba(43, 33, 26, .08);
+}
+
+/* ---------- Thank-you page ---------- */
+.thank-you-wrap {
+  min-height: calc(100vh - 140px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 60px 20px;
+}
+.thank-you-card {
+  max-width: 460px; width: 100%; text-align: center;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  padding: 48px 36px; box-shadow: var(--shadow);
+}
+.check-badge { position: relative; width: 84px; height: 84px; margin: 0 auto 24px; }
+.check-glow {
+  position: absolute; inset: 0; border-radius: 50%; opacity: 0;
+  background: radial-gradient(circle, var(--sage) 0%, transparent 70%);
+}
+.check-badge svg { position: relative; width: 100%; height: 100%; }
+.check-circle, .check-mark {
+  fill: none; stroke: var(--sage); stroke-width: 3;
+  stroke-linecap: round; stroke-linejoin: round;
+  stroke-dasharray: 100; stroke-dashoffset: 0;
+}
+.thank-you-card h1 { font-size: 23px; margin-bottom: 10px; }
+.thank-you-card .sub { color: var(--muted); font-size: 14.5px; margin-bottom: 24px; }
+.thank-you-summary {
+  background: var(--sage-tint); border-radius: 10px; padding: 16px 18px;
+  text-align: left; margin-bottom: 24px;
+}
+.thank-you-summary .row { display: flex; justify-content: space-between; font-size: 14px; padding: 4px 0; color: var(--text); }
+.thank-you-contact { margin-top: 18px; font-size: 13px; color: var(--muted); }
+.thank-you-contact a { color: var(--sage-dark); font-weight: 600; }
+
+/* One-shot draw-in — checkmark strokes itself, then a soft glow pulses
+   behind it. Guarded so it never loops and respects reduced-motion. */
+@keyframes draw-stroke { to { stroke-dashoffset: 0; } }
+@keyframes glow-pulse {
+  0% { opacity: 0; transform: scale(.7); }
+  50% { opacity: .5; }
+  100% { opacity: 0; transform: scale(1.7); }
+}
+@keyframes card-in {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .check-circle { stroke-dashoffset: 100; animation: draw-stroke .6s ease-out forwards; }
+  .check-mark { stroke-dashoffset: 100; animation: draw-stroke .4s ease-out .55s forwards; }
+  .check-glow { animation: glow-pulse 1.1s ease-out .15s; }
+  .thank-you-card { animation: card-in .5s ease-out; }
 }
 
 /* ---------- Responsive ---------- */

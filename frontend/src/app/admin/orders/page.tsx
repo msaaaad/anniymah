@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useToast } from "@/components/Toast";
+import { toast } from "sonner";
 import type { Order, OrderStatus } from "@/lib/types";
 
 const STATUS_LABEL: Record<OrderStatus, string> = {
@@ -23,7 +23,6 @@ const STATUS_STYLE: Record<OrderStatus, string> = {
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[] | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
-  const { showToast } = useToast();
 
   function loadOrders() {
     fetch("/api/orders")
@@ -47,11 +46,11 @@ export default function AdminOrdersPage() {
 
     if (!res.ok) {
       setOrders(previous);
-      showToast("Failed to update order status", "error");
+      toast.error("Failed to update order status");
       return;
     }
 
-    showToast(`Order marked as ${STATUS_LABEL[status]}`, "success");
+    toast.success(`Order marked as ${STATUS_LABEL[status]}`);
     loadOrders();
   }
 

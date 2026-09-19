@@ -50,10 +50,7 @@ input, select, textarea {
   font-size: 16px;
 }
 
-@keyframes toast-in {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-.toast-enter {
-  animation: toast-in .2s ease-out;
-}
+/* sonner toast brand colors — sonner's own classNames hook, needs
+   !important since it also sets these via inline data-attributes */
+.toast-success { background: var(--sage) !important; color: #fff !important; }
+.toast-error { background: var(--rose-dark) !important; color: #fff !important; }

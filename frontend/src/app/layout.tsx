@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
-import { ToastProvider } from "@/components/Toast";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -25,7 +25,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="bn" className={`${fraunces.variable} ${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-bg text-text">
-        <ToastProvider>{children}</ToastProvider>
+        {children}
+        <Toaster
+          position="top-right"
+          offset={{ top: 84 }}
+          toastOptions={{
+            classNames: { success: "toast-success", error: "toast-error" },
+            style: { borderRadius: "10px", border: "none" },
+          }}
+        />
       </body>
     </html>
   );

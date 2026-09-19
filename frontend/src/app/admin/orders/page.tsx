@@ -20,10 +20,21 @@ const STATUS_STYLE: Record<OrderStatus, string> = {
   cancelled: "bg-rose-tint text-rose-dark",
 };
 
+const STATUS_FILTERS: Array<OrderStatus | "all"> = [
+  "all",
+  "pending",
+  "confirmed",
+  "delivered",
+  "rejected",
+  "cancelled",
+];
+
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[] | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState<OrderStatus | "all">("all");
+  const [search, setSearch] = useState("");
 
   function loadOrders() {
     fetch("/api/orders")
@@ -75,16 +86,60 @@ export default function AdminOrdersPage() {
     return <p className="text-muted">Loading...</p>;
   }
 
+  const query = search.trim().toLowerCase();
+  const filteredOrders = orders.filter((order) => {
+    if (statusFilter !== "all" && order.status !== statusFilter) return false;
+    if (!query) return true;
+    return (
+      order.customerName.toLowerCase().includes(query) ||
+      order.phone.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <div>
       <h1 className="font-heading text-2xl font-semibold">Orders</h1>
       <p className="mt-1 text-sm text-muted">{orders.length} total</p>
 
+      <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-wrap gap-2">
+          {STATUS_FILTERS.map((status) => {
+            const count =
+              status === "all" ? orders.length : orders.filter((o) => o.status === status).length;
+            const active = statusFilter === status;
+            return (
+              <button
+                key={status}
+                type="button"
+                onClick={() => setStatusFilter(status)}
+                className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+                  active
+                    ? "bg-sage text-white"
+                    : "bg-media-bg text-muted hover:text-text"
+                }`}
+              >
+                {status === "all" ? "All" : STATUS_LABEL[status]} ({count})
+              </button>
+            );
+          })}
+        </div>
+
+        <input
+          type="search"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          placeholder="Search by name or phone..."
+          className="w-full rounded-[8px] border border-border bg-surface px-3.5 py-2 text-sm focus:border-sage focus:outline-none sm:w-64"
+        />
+      </div>
+
       {orders.length === 0 ? (
         <p className="mt-6 text-muted">No orders yet.</p>
+      ) : filteredOrders.length === 0 ? (
+        <p className="mt-6 text-muted">No orders match your filter.</p>
       ) : (
         <div className="mt-6 flex flex-col gap-3">
-          {orders.map((order) => {
+          {filteredOrders.map((order) => {
             const isOpen = openId === order.id;
             return (
               <div key={order.id} className="rounded-[10px] border border-border bg-surface">

@@ -23,6 +23,7 @@ const STATUS_STYLE: Record<OrderStatus, string> = {
 export default function AdminOrdersPage() {
   const [orders, setOrders] = useState<Order[] | null>(null);
   const [openId, setOpenId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   function loadOrders() {
     fetch("/api/orders")
@@ -52,6 +53,22 @@ export default function AdminOrdersPage() {
 
     toast.success(`Order marked as ${STATUS_LABEL[status]}`);
     loadOrders();
+  }
+
+  async function deleteOrder(id: string) {
+    const previous = orders;
+    setConfirmDeleteId(null);
+    setOrders((prev) => (prev ? prev.filter((o) => o.id !== id) : prev));
+
+    const res = await fetch(`/api/orders/${id}`, { method: "DELETE" });
+
+    if (!res.ok) {
+      setOrders(previous);
+      toast.error("Failed to delete order");
+      return;
+    }
+
+    toast.success("Order deleted");
   }
 
   if (!orders) {
@@ -123,7 +140,7 @@ export default function AdminOrdersPage() {
                       )}
                     </dl>
 
-                    <div className="mt-4 flex flex-wrap gap-2">
+                    <div className="mt-4 flex flex-wrap items-center gap-2">
                       {(Object.keys(STATUS_LABEL) as OrderStatus[]).map((status) => (
                         <button
                           key={status}
@@ -135,6 +152,23 @@ export default function AdminOrdersPage() {
                           Mark {STATUS_LABEL[status]}
                         </button>
                       ))}
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          confirmDeleteId === order.id
+                            ? deleteOrder(order.id)
+                            : setConfirmDeleteId(order.id)
+                        }
+                        onBlur={() => setConfirmDeleteId((id) => (id === order.id ? null : id))}
+                        className={`ml-auto rounded-[8px] border px-4 py-2 text-sm font-medium transition-colors ${
+                          confirmDeleteId === order.id
+                            ? "border-rose-dark bg-rose-dark text-white"
+                            : "border-border text-rose-dark hover:border-rose-dark hover:bg-rose-tint"
+                        }`}
+                      >
+                        {confirmDeleteId === order.id ? "Click again to confirm" : "Delete"}
+                      </button>
                     </div>
                   </div>
                 )}

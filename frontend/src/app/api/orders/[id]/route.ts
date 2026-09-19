@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { updateOrderStatus } from "@/lib/db";
+import { deleteOrder, updateOrderStatus } from "@/lib/db";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/session";
 import type { OrderStatus } from "@/lib/types";
 
@@ -27,4 +27,18 @@ export async function PATCH(
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
   }
   return NextResponse.json(order);
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const token = request.cookies.get(SESSION_COOKIE)?.value;
+  if (!(await verifySessionToken(token))) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await params;
+  await deleteOrder(id);
+  return NextResponse.json({ ok: true });
 }

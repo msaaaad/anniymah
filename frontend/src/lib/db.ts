@@ -301,6 +301,11 @@ export async function createOrder(
   return toOrder(data as OrderRow);
 }
 
+export async function deleteOrder(id: string): Promise<void> {
+  const { error } = await getSupabaseAdmin().from("orders").delete().eq("id", id);
+  if (error) throw new Error(`Failed to delete order: ${error.message}`);
+}
+
 export async function updateOrderStatus(
   id: string,
   status: OrderStatus

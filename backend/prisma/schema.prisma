@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Mirrors frontend/supabase/schema.sql (landing_pages + orders) — this is a
+// separate Postgres instance for the new Nest backend, not a live connection
+// to the Supabase project.
+
+model LandingPage {
+  id           String @id @default(uuid()) @db.Uuid
+  slug         String @unique
+  title        String @default("")
+  description  String @default("")
+  price        Int    @default(0)
+  regularPrice Int    @default(0) @map("regular_price")
+  phone        String @default("")
+  imageUrl     String @default("") @map("image_url")
+
+  collectionEnabled Boolean @default(false) @map("collection_enabled")
+  collectionTitle   String  @default("") @map("collection_title")
+  collectionItems   Json    @default("[]") @map("collection_items")
+
+  featuresEnabled  Boolean @default(false) @map("features_enabled")
+  featuresTitle    String  @default("") @map("features_title")
+  featuresSubtitle String  @default("") @map("features_subtitle")
+  features         Json    @default("[]")
+
+  shippingBarEnabled Boolean @default(false) @map("shipping_bar_enabled")
+  shippingBarItems   Json    @default("[]") @map("shipping_bar_items")
+
+  freeDelivery               Boolean @default(true) @map("free_delivery")
+  deliveryChargeInsideDhaka  Int     @default(0) @map("delivery_charge_inside_dhaka")
+  deliveryChargeOutsideDhaka Int     @default(0) @map("delivery_charge_outside_dhaka")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  orders Order[]
+
+  @@map("landing_pages")
+}
+
+enum DeliveryZone {
+  inside_dhaka
+  outside_dhaka
+
+  @@map("delivery_zone")
+}
+
+enum OrderStatus {
+  pending
+  confirmed
+  delivered
+  cancelled
+  rejected
+
+  @@map("order_status")
+}
+
+model Order {
+  id            String       @id @default(uuid()) @db.Uuid
+  landingPageId String?      @map("landing_page_id") @db.Uuid
+  landingPage   LandingPage? @relation(fields: [landingPageId], references: [id], onDelete: SetNull)
+
+  customerName String @map("customer_name")
+  phone        String
+  address      String
+
+  // 1–20 enforced at the application layer (DTO validation), not by a DB
+  // check constraint — matches the original Supabase schema's intent.
+  quantity  Int
+  unitPrice Int @map("unit_price")
+
+  deliveryZone   DeliveryZone? @map("delivery_zone")
+  deliveryCharge Int           @default(0) @map("delivery_charge")
+  total          Int
+
+  notes  String      @default("")
+  status OrderStatus @default(pending)
+
+  courierTrackingId String? @map("courier_tracking_id")
+
+  createdAt   DateTime  @default(now()) @map("created_at")
+  confirmedAt DateTime? @map("confirmed_at")
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("orders")
+}

@@ -4,7 +4,10 @@ import Script from "next/script";
 import { Toaster } from "sonner";
 import "./globals.css";
 
-const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID;
+// No NEXT_PUBLIC_ prefix needed — this file is a Server Component, so
+// process.env is read on the server at render time and the value is baked
+// straight into the returned HTML, not inlined into a client bundle.
+const META_PIXEL_ID = process.env.META_PIXEL_ID;
 
 const fraunces = Fraunces({
   variable: "--font-fraunces",

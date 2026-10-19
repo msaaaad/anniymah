@@ -23,7 +23,7 @@ export class OrdersService {
 
     for (const item of dto.items) {
       const product = productMap.get(item.productId);
-      if (!product || !product.active) {
+      if (!product || !product.active || product.deletedAt) {
         throw new BadRequestException(`Product ${item.productId} is not available`);
       }
     }

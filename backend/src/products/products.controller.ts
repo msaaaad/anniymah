@@ -1,8 +1,10 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
-import { ApiCookieAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiCookieAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { SessionGuard } from '../auth/session.guard.js';
 import { SESSION_COOKIE } from '../auth/session.service.js';
+import { PaginationQueryDto } from '../common/pagination.dto.js';
 import { CreateProductDto } from './dto/create-product.dto.js';
+import { ListProductsQueryDto } from './dto/list-products.query.dto.js';
 import { UpdateProductDto } from './dto/update-product.dto.js';
 import { ProductsService } from './products.service.js';
 
@@ -12,10 +14,38 @@ export class ProductsController {
   constructor(private readonly products: ProductsService) {}
 
   @Get()
-  @ApiQuery({ name: 'categoryId', required: false })
-  @ApiOperation({ summary: 'List products, optionally filtered by category (public — storefront listing)' })
-  list(@Query('categoryId') categoryId?: string) {
-    return this.products.list(categoryId);
+  @ApiOperation({ summary: 'List products — paginated, searchable, filterable by category, sortable (public)' })
+  list(@Query() query: ListProductsQueryDto) {
+    return this.products.list(query);
+  }
+
+  // Must come before GET /products/:slug or "trash" would be parsed as a slug.
+  @Get('trash')
+  @UseGuards(SessionGuard)
+  @ApiCookieAuth(SESSION_COOKIE)
+  @ApiOperation({ summary: 'List soft-deleted products, paginated (admin only)' })
+  listTrash(@Query() query: PaginationQueryDto) {
+    return this.products.listTrash(query);
+  }
+
+  @Post('trash/:id/restore')
+  @UseGuards(SessionGuard)
+  @ApiCookieAuth(SESSION_COOKIE)
+  @ApiOperation({ summary: 'Restore a soft-deleted product out of the trash (admin only)' })
+  @ApiResponse({ status: 404, description: 'Not in trash' })
+  restore(@Param('id') id: string) {
+    return this.products.restore(id);
+  }
+
+  @Delete('trash/:id')
+  @HttpCode(204)
+  @UseGuards(SessionGuard)
+  @ApiCookieAuth(SESSION_COOKIE)
+  @ApiOperation({ summary: 'Permanently delete a product from the trash (admin only) — cannot be undone' })
+  @ApiResponse({ status: 204, description: 'Permanently deleted' })
+  @ApiResponse({ status: 404, description: 'Not in trash' })
+  permanentlyDelete(@Param('id') id: string) {
+    return this.products.permanentlyDelete(id);
   }
 
   @Get(':slug')
@@ -50,8 +80,8 @@ export class ProductsController {
   @HttpCode(204)
   @UseGuards(SessionGuard)
   @ApiCookieAuth(SESSION_COOKIE)
-  @ApiOperation({ summary: 'Delete a product (admin only) — also deletes its images from storage' })
-  @ApiResponse({ status: 204, description: 'Deleted' })
+  @ApiOperation({ summary: 'Soft-delete a product (admin only) — moves it to the trash, see GET /products/trash' })
+  @ApiResponse({ status: 204, description: 'Moved to trash' })
   remove(@Param('id') id: string) {
     return this.products.remove(id);
   }

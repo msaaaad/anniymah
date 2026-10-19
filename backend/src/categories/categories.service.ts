@@ -1,4 +1,5 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { paginate, PaginationQueryDto } from '../common/pagination.dto.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { CreateCategoryDto } from './dto/create-category.dto.js';
 import { UpdateCategoryDto } from './dto/update-category.dto.js';
@@ -8,7 +9,7 @@ export class CategoriesService {
   constructor(private readonly prisma: PrismaService) {}
 
   list() {
-    return this.prisma.category.findMany({ orderBy: { name: 'asc' } });
+    return this.prisma.category.findMany({ where: { deletedAt: null }, orderBy: { name: 'asc' } });
   }
 
   async create(dto: CreateCategoryDto) {
@@ -17,20 +18,56 @@ export class CategoriesService {
   }
 
   async update(id: string, dto: UpdateCategoryDto) {
+    await this.findActiveOrThrow(id);
     if (dto.slug) await this.assertSlugFree(dto.slug, id);
-    try {
-      return await this.prisma.category.update({ where: { id }, data: dto });
-    } catch {
-      throw new NotFoundException('Category not found');
-    }
+    return this.prisma.category.update({ where: { id }, data: dto });
   }
 
+  // Soft delete — moves the category to the trash. Products pointing at it
+  // keep their categoryId until it's restored or they're reassigned.
   async remove(id: string) {
-    try {
-      await this.prisma.category.delete({ where: { id } });
-    } catch {
-      throw new NotFoundException('Category not found');
-    }
+    await this.findActiveOrThrow(id);
+    await this.prisma.category.update({ where: { id }, data: { deletedAt: new Date() } });
+  }
+
+  async listTrash(query: PaginationQueryDto) {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 20;
+    const where = { deletedAt: { not: null } };
+
+    const [data, total] = await Promise.all([
+      this.prisma.category.findMany({
+        where,
+        orderBy: { deletedAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.category.count({ where }),
+    ]);
+
+    return paginate(data, total, page, limit);
+  }
+
+  async restore(id: string) {
+    await this.findTrashedOrThrow(id);
+    return this.prisma.category.update({ where: { id }, data: { deletedAt: null } });
+  }
+
+  async permanentlyDelete(id: string) {
+    await this.findTrashedOrThrow(id);
+    await this.prisma.category.delete({ where: { id } });
+  }
+
+  private async findActiveOrThrow(id: string) {
+    const category = await this.prisma.category.findUnique({ where: { id } });
+    if (!category || category.deletedAt) throw new NotFoundException('Category not found');
+    return category;
+  }
+
+  private async findTrashedOrThrow(id: string) {
+    const category = await this.prisma.category.findUnique({ where: { id } });
+    if (!category || !category.deletedAt) throw new NotFoundException('Category not found in trash');
+    return category;
   }
 
   private async assertSlugFree(slug: string, excludingId?: string) {

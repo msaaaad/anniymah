@@ -256,3 +256,25 @@ model HeroBanner {
   @@index([active])
   @@map("hero_banners")
 }
+
+// ---------- Promotions (site-wide, time-bound % off) ----------
+// e.g. "Victory Day Sale — 16% off everything, Dec 16 for 3 days". Applies
+// on top of each product's own price, not regularPrice — admin doesn't have
+// to touch every product's pricing to run a seasonal sale.
+
+model Promotion {
+  id              String @id @default(uuid()) @db.Uuid
+  name            String
+  discountPercent Int    @map("discount_percent")
+
+  startsAt DateTime @map("starts_at")
+  endsAt   DateTime @map("ends_at")
+
+  active Boolean @default(true)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([startsAt, endsAt])
+  @@map("promotions")
+}

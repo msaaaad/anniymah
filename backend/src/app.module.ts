@@ -14,6 +14,7 @@ import { ProductsModule } from './products/products.module.js';
 import { OrdersModule } from './orders/orders.module.js';
 import { CustomersModule } from './customers/customers.module.js';
 import { HeroBannersModule } from './hero-banners/hero-banners.module.js';
+import { PromotionsModule } from './promotions/promotions.module.js';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { HeroBannersModule } from './hero-banners/hero-banners.module.js';
     CustomersModule,
     OrdersModule,
     HeroBannersModule,
+    PromotionsModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],

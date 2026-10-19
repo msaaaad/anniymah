@@ -126,11 +126,13 @@ model Category {
   name String
   slug String @unique
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   products Product[]
 
+  @@index([deletedAt])
   @@map("categories")
 }
 
@@ -152,8 +154,9 @@ model Product {
 
   active Boolean @default(true)
 
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
 
   images     ProductImage[]
   orderItems OrderItem[]
@@ -161,6 +164,7 @@ model Product {
 
   @@index([categoryId])
   @@index([active])
+  @@index([deletedAt])
   @@map("products")
 }
 

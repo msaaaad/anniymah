@@ -4,7 +4,7 @@ import type { Product } from '../generated/prisma/client.js';
 import { CreateOrderDto } from './dto/create-order.dto.js';
 import { ListOrdersQueryDto } from './dto/list-orders.query.dto.js';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto.js';
-import { isValidBangladeshiPhone, normalizePhone } from './phone.util.js';
+import { isValidBangladeshiPhone, normalizePhone } from '../common/phone.util.js';
 
 const ORDER_INCLUDE = { items: true };
 
@@ -12,7 +12,7 @@ const ORDER_INCLUDE = { items: true };
 export class OrdersService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(dto: CreateOrderDto) {
+  async create(dto: CreateOrderDto, customerId?: string) {
     if (!isValidBangladeshiPhone(dto.phone)) {
       throw new BadRequestException('সঠিক বাংলাদেশী মোবাইল নম্বর দিন (যেমন: 01712345678)');
     }
@@ -57,6 +57,7 @@ export class OrdersService {
 
     return this.prisma.order.create({
       data: {
+        customerId,
         customerName: dto.customerName.trim(),
         phone: normalizePhone(dto.phone),
         address: dto.address.trim(),

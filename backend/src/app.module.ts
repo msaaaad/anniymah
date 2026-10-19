@@ -12,6 +12,7 @@ import { UploadsModule } from './uploads/uploads.module.js';
 import { CategoriesModule } from './categories/categories.module.js';
 import { ProductsModule } from './products/products.module.js';
 import { OrdersModule } from './orders/orders.module.js';
+import { CustomersModule } from './customers/customers.module.js';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { OrdersModule } from './orders/orders.module.js';
     UploadsModule,
     CategoriesModule,
     ProductsModule,
+    CustomersModule,
     OrdersModule,
   ],
   controllers: [AppController],

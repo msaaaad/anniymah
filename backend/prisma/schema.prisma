@@ -67,6 +67,11 @@ enum OrderStatus {
 model Order {
   id String @id @default(uuid()) @db.Uuid
 
+  // Optional — checkout stays guest-friendly (no account required), this is
+  // only set when the person placing the order happens to be logged in.
+  customerId String?   @map("customer_id") @db.Uuid
+  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+
   customerName String @map("customer_name")
   phone        String
   address      String
@@ -152,6 +157,7 @@ model Product {
 
   images     ProductImage[]
   orderItems OrderItem[]
+  cartItems  CartItem[]
 
   @@index([categoryId])
   @@index([active])
@@ -170,4 +176,58 @@ model ProductImage {
 
   @@index([productId])
   @@map("product_images")
+}
+
+// ---------- Customer accounts + server-side cart ----------
+// Checkout itself stays guest-friendly (Order never requires a customer) —
+// this is for customers who choose to create an account, so their cart
+// persists and syncs across devices instead of living only in the browser.
+
+model Customer {
+  id           String  @id @default(uuid()) @db.Uuid
+  phone        String  @unique
+  email        String? @unique
+  name         String  @default("")
+  passwordHash String  @map("password_hash")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  cart   Cart?
+  orders Order[]
+
+  @@map("customers")
+}
+
+model Cart {
+  id         String   @id @default(uuid()) @db.Uuid
+  customerId String   @unique @map("customer_id") @db.Uuid
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  items CartItem[]
+
+  @@map("carts")
+}
+
+model CartItem {
+  id     String @id @default(uuid()) @db.Uuid
+  cartId String @map("cart_id") @db.Uuid
+  cart   Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  productId String  @map("product_id") @db.Uuid
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  // 1–20 enforced at the application layer, same as OrderItem.
+  quantity Int @default(1)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // One row per product per cart — adding an already-present product
+  // increments quantity instead of creating a duplicate row.
+  @@unique([cartId, productId])
+  @@map("cart_items")
 }

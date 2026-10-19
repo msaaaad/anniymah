@@ -1,8 +1,11 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
+import type { Request } from 'express';
 import { SessionGuard } from '../auth/session.guard.js';
 import { SESSION_COOKIE } from '../auth/session.service.js';
+import { CartService } from '../customers/cart.service.js';
+import { CUSTOMER_SESSION_COOKIE, CustomerSessionService } from '../customers/customer-session.service.js';
 import { CreateOrderDto } from './dto/create-order.dto.js';
 import { ListOrdersQueryDto } from './dto/list-orders.query.dto.js';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto.js';
@@ -11,22 +14,35 @@ import { OrdersService } from './orders.service.js';
 @ApiTags('orders')
 @Controller('orders')
 export class OrdersController {
-  constructor(private readonly orders: OrdersService) {}
+  constructor(
+    private readonly orders: OrdersService,
+    private readonly customerSession: CustomerSessionService,
+    private readonly cart: CartService,
+  ) {}
 
   @Post()
   // Generous enough for a real customer retrying checkout a few times,
   // tight enough to blunt a scripted flood of fake orders.
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
-  @ApiOperation({ summary: 'Place an order (public — storefront checkout)' })
+  @ApiOperation({ summary: 'Place an order (public — storefront checkout; attaches the customer if logged in)' })
   @ApiResponse({ status: 201, description: 'Order created' })
   @ApiResponse({ status: 400, description: 'Invalid phone, unavailable product, or missing delivery zone' })
-  async create(@Body() dto: CreateOrderDto) {
+  async create(@Body() dto: CreateOrderDto, @Req() req: Request) {
     // Honeypot: a hidden field real customers never fill in. Bots that
     // auto-fill every field trip it; pretend success so they don't retry.
     if (dto.company && dto.company.trim() !== '') {
       return { ok: true };
     }
-    return this.orders.create(dto);
+
+    // Checkout stays guest-friendly — being logged in is optional, this
+    // just links the order to the account (and clears their cart) when it
+    // applies, rather than requiring it.
+    const customerToken = req.cookies?.[CUSTOMER_SESSION_COOKIE] as string | undefined;
+    const customerId = this.customerSession.verifySessionToken(customerToken) ?? undefined;
+
+    const order = await this.orders.create(dto, customerId);
+    if (customerId) await this.cart.clear(customerId);
+    return order;
   }
 
   @Get()

@@ -70,7 +70,7 @@ export class CategoriesController {
   @ApiCookieAuth(SESSION_COOKIE)
   @ApiOperation({ summary: 'Soft-delete a category (admin only) — moves it to the trash, see GET /categories/trash' })
   @ApiResponse({ status: 204, description: 'Moved to trash' })
-  remove(@Param('id') id: string) {
-    return this.categories.remove(id);
+  softDelete(@Param('id') id: string) {
+    return this.categories.softDelete(id);
   }
 }

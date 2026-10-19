@@ -6,7 +6,7 @@ import { LoginDto } from './dto/login.dto.js';
 import { SESSION_COOKIE, SessionService } from './session.service.js';
 import { SessionGuard } from './session.guard.js';
 
-const COOKIE_MAX_AGE_MS = 1000 * 60 * 60 * 24 * 7; // 7 days
+const SEVEN_DAYS_MS = 1000 * 60 * 60 * 24 * 7;
 
 @ApiTags('auth')
 @Controller('auth')
@@ -15,8 +15,6 @@ export class AuthController {
 
   @Post('login')
   @HttpCode(200)
-  // Much stricter than the global default — this is the one endpoint where
-  // an attacker gets to guess a password, so it needs its own limit.
   @Throttle({ default: { limit: 5, ttl: 60_000 } })
   @ApiOperation({ summary: 'Log in with the admin email/password, sets the session cookie' })
   @ApiResponse({ status: 200, description: 'Logged in' })
@@ -38,7 +36,7 @@ export class AuthController {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: COOKIE_MAX_AGE_MS,
+      maxAge: SEVEN_DAYS_MS,
     });
     return { ok: true };
   }

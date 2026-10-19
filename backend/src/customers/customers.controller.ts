@@ -9,7 +9,7 @@ import { CustomersService } from './customers.service.js';
 import { LoginCustomerDto } from './dto/login-customer.dto.js';
 import { RegisterCustomerDto } from './dto/register-customer.dto.js';
 
-const COOKIE_MAX_AGE_MS = 1000 * 60 * 60 * 24 * 30; // 30 days
+const THIRTY_DAYS_MS = 1000 * 60 * 60 * 24 * 30;
 
 @ApiTags('customers')
 @Controller('customers')
@@ -66,7 +66,7 @@ export class CustomersController {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: COOKIE_MAX_AGE_MS,
+      maxAge: THIRTY_DAYS_MS,
     });
   }
 }

@@ -25,7 +25,7 @@ export class OrdersService {
     const productIds = [...new Set(dto.items.map((item) => item.productId))];
     const [products, activePromotion] = await Promise.all([
       this.prisma.product.findMany({ where: { id: { in: productIds } } }),
-      this.promotions.getActiveNow(),
+      this.promotions.getHighestDiscountActiveNow(),
     ]);
     const productMap = new Map(products.map((p) => [p.id, p]));
     const priceFor = (product: Product) => applyDiscount(product.price, activePromotion);
@@ -37,27 +37,10 @@ export class OrdersService {
       }
     }
 
-    // Delivery is charged once per order, not once per item — the charge is
-    // the highest per-zone charge among the paid (non-free-delivery) items,
-    // never a sum of all of them.
-    const paidProducts = dto.items
-      .map((item) => productMap.get(item.productId) as Product)
-      .filter((product) => !product.freeDelivery);
-
-    let deliveryZone: 'inside_dhaka' | 'outside_dhaka' | null = null;
-    let deliveryCharge = 0;
-
-    if (paidProducts.length > 0) {
-      if (dto.deliveryZone !== 'inside_dhaka' && dto.deliveryZone !== 'outside_dhaka') {
-        throw new BadRequestException('Please select a delivery area');
-      }
-      deliveryZone = dto.deliveryZone;
-      deliveryCharge = Math.max(
-        ...paidProducts.map((product) =>
-          deliveryZone === 'inside_dhaka' ? product.deliveryChargeInsideDhaka : product.deliveryChargeOutsideDhaka,
-        ),
-      );
-    }
+    const { zone: deliveryZone, charge: deliveryCharge } = this.highestDeliveryChargeAcrossItems(
+      dto.items.map((item) => productMap.get(item.productId) as Product),
+      dto.deliveryZone,
+    );
 
     const itemsTotal = dto.items.reduce((sum, item) => {
       const product = productMap.get(item.productId) as Product;
@@ -88,6 +71,25 @@ export class OrdersService {
       },
       include: ORDER_INCLUDE,
     });
+  }
+
+  private highestDeliveryChargeAcrossItems(
+    products: Product[],
+    requestedZone: 'inside_dhaka' | 'outside_dhaka' | undefined,
+  ): { zone: 'inside_dhaka' | 'outside_dhaka' | null; charge: number } {
+    const paidProducts = products.filter((product) => !product.freeDelivery);
+    if (paidProducts.length === 0) {
+      return { zone: null, charge: 0 };
+    }
+
+    if (requestedZone !== 'inside_dhaka' && requestedZone !== 'outside_dhaka') {
+      throw new BadRequestException('Please select a delivery area');
+    }
+
+    const chargeFor = (product: Product) =>
+      requestedZone === 'inside_dhaka' ? product.deliveryChargeInsideDhaka : product.deliveryChargeOutsideDhaka;
+
+    return { zone: requestedZone, charge: Math.max(...paidProducts.map(chargeFor)) };
   }
 
   list(query: ListOrdersQueryDto) {

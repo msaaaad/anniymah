@@ -6,7 +6,7 @@ import { SessionGuard } from '../auth/session.guard.js';
 import { SESSION_COOKIE } from '../auth/session.service.js';
 import { StorageService } from '../storage/storage.service.js';
 
-const MAX_BYTES = 5 * 1024 * 1024; // 5MB per file — matches the frontend's existing cap
+const MAX_UPLOAD_BYTES_PER_FILE = 5 * 1024 * 1024;
 const MAX_FILES = 8;
 
 @ApiTags('uploads')
@@ -17,7 +17,7 @@ export class UploadsController {
   constructor(private readonly storage: StorageService) {}
 
   @Post()
-  @UseInterceptors(FilesInterceptor('files', MAX_FILES, { limits: { fileSize: MAX_BYTES } }))
+  @UseInterceptors(FilesInterceptor('files', MAX_FILES, { limits: { fileSize: MAX_UPLOAD_BYTES_PER_FILE } }))
   @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: { type: 'object', properties: { files: { type: 'array', items: { type: 'string', format: 'binary' } } } },

@@ -1,6 +1,8 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import type { Product } from '../generated/prisma/client.js';
+import { applyDiscount } from '../promotions/promotion-price.util.js';
+import { PromotionsService } from '../promotions/promotions.service.js';
 import { CreateOrderDto } from './dto/create-order.dto.js';
 import { ListOrdersQueryDto } from './dto/list-orders.query.dto.js';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto.js';
@@ -10,7 +12,10 @@ const ORDER_INCLUDE = { items: true };
 
 @Injectable()
 export class OrdersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly promotions: PromotionsService,
+  ) {}
 
   async create(dto: CreateOrderDto, customerId?: string) {
     if (!isValidBangladeshiPhone(dto.phone)) {
@@ -18,8 +23,12 @@ export class OrdersService {
     }
 
     const productIds = [...new Set(dto.items.map((item) => item.productId))];
-    const products = await this.prisma.product.findMany({ where: { id: { in: productIds } } });
+    const [products, activePromotion] = await Promise.all([
+      this.prisma.product.findMany({ where: { id: { in: productIds } } }),
+      this.promotions.getActiveNow(),
+    ]);
     const productMap = new Map(products.map((p) => [p.id, p]));
+    const priceFor = (product: Product) => applyDiscount(product.price, activePromotion);
 
     for (const item of dto.items) {
       const product = productMap.get(item.productId);
@@ -52,7 +61,7 @@ export class OrdersService {
 
     const itemsTotal = dto.items.reduce((sum, item) => {
       const product = productMap.get(item.productId) as Product;
-      return sum + product.price * item.quantity;
+      return sum + priceFor(product) * item.quantity;
     }, 0);
 
     return this.prisma.order.create({
@@ -71,7 +80,7 @@ export class OrdersService {
             return {
               productId: product.id,
               productName: product.name,
-              unitPrice: product.price,
+              unitPrice: priceFor(product),
               quantity: item.quantity,
             };
           }),

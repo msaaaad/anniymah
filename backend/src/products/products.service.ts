@@ -1,6 +1,8 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma } from '../generated/prisma/client.js';
+import { Prisma, type Product } from '../generated/prisma/client.js';
 import { paginate, PaginationQueryDto } from '../common/pagination.dto.js';
+import { applyDiscount } from '../promotions/promotion-price.util.js';
+import { PromotionsService } from '../promotions/promotions.service.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { StorageService } from '../storage/storage.service.js';
 import { CreateProductDto } from './dto/create-product.dto.js';
@@ -21,6 +23,7 @@ export class ProductsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly storage: StorageService,
+    private readonly promotions: PromotionsService,
   ) {}
 
   async list(query: ListProductsQueryDto) {
@@ -38,7 +41,7 @@ export class ProductsService {
       }),
     };
 
-    const [data, total] = await Promise.all([
+    const [data, total, promotion] = await Promise.all([
       this.prisma.product.findMany({
         where,
         include: IMAGE_INCLUDE,
@@ -47,15 +50,27 @@ export class ProductsService {
         take: limit,
       }),
       this.prisma.product.count({ where }),
+      this.promotions.getActiveNow(),
     ]);
 
-    return paginate(data, total, page, limit);
+    return paginate(data.map((p) => this.withEffectivePrice(p, promotion)), total, page, limit);
   }
 
   async findBySlug(slug: string) {
-    const product = await this.prisma.product.findUnique({ where: { slug }, include: IMAGE_INCLUDE });
+    const [product, promotion] = await Promise.all([
+      this.prisma.product.findUnique({ where: { slug }, include: IMAGE_INCLUDE }),
+      this.promotions.getActiveNow(),
+    ]);
     if (!product || product.deletedAt) throw new NotFoundException('Product not found');
-    return product;
+    return this.withEffectivePrice(product, promotion);
+  }
+
+  private withEffectivePrice<T extends Product>(product: T, promotion: { discountPercent: number } | null) {
+    return {
+      ...product,
+      effectivePrice: applyDiscount(product.price, promotion),
+      activeDiscountPercent: promotion?.discountPercent ?? 0,
+    };
   }
 
   async create(dto: CreateProductDto) {

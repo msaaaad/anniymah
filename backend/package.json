@@ -23,7 +23,8 @@
     "db:down": "docker compose down",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:studio": "prisma studio"
+    "prisma:studio": "prisma studio",
+    "docs:generate": "node dist/generate-openapi.js"
   },
   "dependencies": {
     "@nestjs/common": "^12.0.1",

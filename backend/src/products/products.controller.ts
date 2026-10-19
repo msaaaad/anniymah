@@ -19,7 +19,6 @@ export class ProductsController {
     return this.products.list(query);
   }
 
-  // Must come before GET /products/:slug or "trash" would be parsed as a slug.
   @Get('trash')
   @UseGuards(SessionGuard)
   @ApiCookieAuth(SESSION_COOKIE)
@@ -82,7 +81,7 @@ export class ProductsController {
   @ApiCookieAuth(SESSION_COOKIE)
   @ApiOperation({ summary: 'Soft-delete a product (admin only) — moves it to the trash, see GET /products/trash' })
   @ApiResponse({ status: 204, description: 'Moved to trash' })
-  remove(@Param('id') id: string) {
-    return this.products.remove(id);
+  softDelete(@Param('id') id: string) {
+    return this.products.softDelete(id);
   }
 }

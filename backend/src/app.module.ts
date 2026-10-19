@@ -16,12 +16,12 @@ import { CustomersModule } from './customers/customers.module.js';
 import { HeroBannersModule } from './hero-banners/hero-banners.module.js';
 import { PromotionsModule } from './promotions/promotions.module.js';
 
+const DEFAULT_RATE_LIMIT = { name: 'default', ttl: 60_000, limit: 60 };
+
 @Module({
   imports: [
     ConfigModule.forRoot({ isGlobal: true }),
-    // Generous global default (60 req/min/IP) — routes that need a tighter
-    // limit (e.g. login) override it with their own @Throttle().
-    ThrottlerModule.forRoot([{ name: 'default', ttl: 60_000, limit: 60 }]),
+    ThrottlerModule.forRoot([DEFAULT_RATE_LIMIT]),
     PrismaModule,
     StorageModule,
     HealthModule,

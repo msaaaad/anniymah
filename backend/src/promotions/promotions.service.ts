@@ -3,6 +3,8 @@ import { PrismaService } from '../prisma/prisma.service.js';
 import { CreatePromotionDto } from './dto/create-promotion.dto.js';
 import { UpdatePromotionDto } from './dto/update-promotion.dto.js';
 
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
 @Injectable()
 export class PromotionsService {
   constructor(private readonly prisma: PrismaService) {}
@@ -11,9 +13,7 @@ export class PromotionsService {
     return this.prisma.promotion.findMany({ orderBy: { startsAt: 'desc' } });
   }
 
-  // If more than one promotion happens to be running at once, the biggest
-  // discount wins — simpler than rejecting overlapping date ranges outright.
-  async getActiveNow() {
+  async getHighestDiscountActiveNow() {
     const now = new Date();
     const candidates = await this.prisma.promotion.findMany({
       where: { active: true, startsAt: { lte: now }, endsAt: { gte: now } },
@@ -25,7 +25,7 @@ export class PromotionsService {
 
   create(dto: CreatePromotionDto) {
     const startsAt = new Date(dto.startsAt);
-    const endsAt = new Date(startsAt.getTime() + dto.durationDays * 24 * 60 * 60 * 1000);
+    const endsAt = new Date(startsAt.getTime() + dto.durationDays * ONE_DAY_MS);
 
     return this.prisma.promotion.create({
       data: {
@@ -44,7 +44,7 @@ export class PromotionsService {
 
     const startsAt = dto.startsAt ? new Date(dto.startsAt) : existing.startsAt;
     const durationMs = dto.durationDays
-      ? dto.durationDays * 24 * 60 * 60 * 1000
+      ? dto.durationDays * ONE_DAY_MS
       : existing.endsAt.getTime() - existing.startsAt.getTime();
 
     return this.prisma.promotion.update({

@@ -50,7 +50,7 @@ export class ProductsService {
         take: limit,
       }),
       this.prisma.product.count({ where }),
-      this.promotions.getActiveNow(),
+      this.promotions.getHighestDiscountActiveNow(),
     ]);
 
     return paginate(data.map((p) => this.withEffectivePrice(p, promotion)), total, page, limit);
@@ -59,7 +59,7 @@ export class ProductsService {
   async findBySlug(slug: string) {
     const [product, promotion] = await Promise.all([
       this.prisma.product.findUnique({ where: { slug }, include: IMAGE_INCLUDE }),
-      this.promotions.getActiveNow(),
+      this.promotions.getHighestDiscountActiveNow(),
     ]);
     if (!product || product.deletedAt) throw new NotFoundException('Product not found');
     return this.withEffectivePrice(product, promotion);
@@ -120,10 +120,7 @@ export class ProductsService {
     });
   }
 
-  // Soft delete — moves the product to the trash. Images and DB rows stay
-  // put so it can be restored; nothing is touched in Storage until it's
-  // permanently deleted from the trash.
-  async remove(id: string) {
+  async softDelete(id: string) {
     await this.findActiveOrThrow(id);
     await this.prisma.product.update({ where: { id }, data: { deletedAt: new Date() } });
   }
@@ -152,9 +149,6 @@ export class ProductsService {
     return this.prisma.product.update({ where: { id }, data: { deletedAt: null }, include: IMAGE_INCLUDE });
   }
 
-  // Permanent delete — only allowed from the trash, as a deliberate second
-  // step. Actually removes the row (cascading its images) and cleans up
-  // the image files in Storage.
   async permanentlyDelete(id: string) {
     const existing = await this.findTrashedOrThrow(id);
     await this.prisma.product.delete({ where: { id } });

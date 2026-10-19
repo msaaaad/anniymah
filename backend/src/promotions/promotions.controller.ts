@@ -14,7 +14,7 @@ export class PromotionsController {
   @Get('active')
   @ApiOperation({ summary: 'Get the currently running promotion, if any (public)' })
   getActive() {
-    return this.promotions.getActiveNow();
+    return this.promotions.getHighestDiscountActiveNow();
   }
 
   @Get()

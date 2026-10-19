@@ -23,9 +23,7 @@ export class CategoriesService {
     return this.prisma.category.update({ where: { id }, data: dto });
   }
 
-  // Soft delete — moves the category to the trash. Products pointing at it
-  // keep their categoryId until it's restored or they're reassigned.
-  async remove(id: string) {
+  async softDelete(id: string) {
     await this.findActiveOrThrow(id);
     await this.prisma.category.update({ where: { id }, data: { deletedAt: new Date() } });
   }

@@ -21,28 +21,28 @@ export class OrdersController {
   ) {}
 
   @Post()
-  // Generous enough for a real customer retrying checkout a few times,
-  // tight enough to blunt a scripted flood of fake orders.
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
   @ApiOperation({ summary: 'Place an order (public — storefront checkout; attaches the customer if logged in)' })
   @ApiResponse({ status: 201, description: 'Order created' })
   @ApiResponse({ status: 400, description: 'Invalid phone, unavailable product, or missing delivery zone' })
   async create(@Body() dto: CreateOrderDto, @Req() req: Request) {
-    // Honeypot: a hidden field real customers never fill in. Bots that
-    // auto-fill every field trip it; pretend success so they don't retry.
-    if (dto.company && dto.company.trim() !== '') {
+    if (this.honeypotFieldWasFilled(dto)) {
       return { ok: true };
     }
 
-    // Checkout stays guest-friendly — being logged in is optional, this
-    // just links the order to the account (and clears their cart) when it
-    // applies, rather than requiring it.
-    const customerToken = req.cookies?.[CUSTOMER_SESSION_COOKIE] as string | undefined;
-    const customerId = this.customerSession.verifySessionToken(customerToken) ?? undefined;
-
+    const customerId = this.resolveOptionalLoggedInCustomerId(req);
     const order = await this.orders.create(dto, customerId);
     if (customerId) await this.cart.clear(customerId);
     return order;
+  }
+
+  private honeypotFieldWasFilled(dto: CreateOrderDto): boolean {
+    return Boolean(dto.company && dto.company.trim() !== '');
+  }
+
+  private resolveOptionalLoggedInCustomerId(req: Request): string | undefined {
+    const customerToken = req.cookies?.[CUSTOMER_SESSION_COOKIE] as string | undefined;
+    return this.customerSession.verifySessionToken(customerToken) ?? undefined;
   }
 
   @Get()

@@ -41,9 +41,6 @@ export class StorageService {
     return data.publicUrl;
   }
 
-  // Best-effort cleanup — deletes an admin-uploaded image once it's no
-  // longer referenced. Silently no-ops for empty/external URLs so it's
-  // safe to call with any url value.
   async deleteIfOwned(url: string): Promise<void> {
     if (!url) return;
     const marker = `/object/public/${BUCKET}/`;

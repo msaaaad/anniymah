@@ -2,10 +2,9 @@ import { createHmac, timingSafeEqual as nodeTimingSafeEqual } from 'node:crypto'
 import { Injectable } from '@nestjs/common';
 
 export const SESSION_COOKIE = 'anniymah_admin_session';
-const SESSION_TTL_MS = 1000 * 60 * 60 * 24 * 7; // 7 days
+const SEVEN_DAYS_MS = 1000 * 60 * 60 * 24 * 7;
+const TOKEN_FIELD_SEPARATOR = '|';
 
-// Same token shape as the Next.js frontend's lib/session.ts: "email|expiresAt|hmac".
-// "|" (not ".") separates fields — email addresses always contain dots.
 @Injectable()
 export class SessionService {
   private sign(payload: string): string {
@@ -20,20 +19,20 @@ export class SessionService {
   }
 
   createSessionToken(email: string): string {
-    const expiresAt = Date.now() + SESSION_TTL_MS;
-    const payload = `${email}|${expiresAt}`;
-    return `${payload}|${this.sign(payload)}`;
+    const expiresAt = Date.now() + SEVEN_DAYS_MS;
+    const payload = `${email}${TOKEN_FIELD_SEPARATOR}${expiresAt}`;
+    return `${payload}${TOKEN_FIELD_SEPARATOR}${this.sign(payload)}`;
   }
 
   verifySessionToken(token: string | undefined): boolean {
     if (!token) return false;
-    const parts = token.split('|');
+    const parts = token.split(TOKEN_FIELD_SEPARATOR);
     if (parts.length !== 3) return false;
     const [email, expiresAtRaw, signature] = parts;
     const expiresAt = Number(expiresAtRaw);
     if (!Number.isFinite(expiresAt) || Date.now() > expiresAt) return false;
 
-    const expectedSignature = this.sign(`${email}|${expiresAtRaw}`);
+    const expectedSignature = this.sign(`${email}${TOKEN_FIELD_SEPARATOR}${expiresAtRaw}`);
     if (!this.timingSafeEqual(signature, expectedSignature)) return false;
 
     return email === (process.env.ADMIN_EMAIL ?? '').toLowerCase();

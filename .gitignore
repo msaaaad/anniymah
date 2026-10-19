@@ -1,2 +1,14 @@
 # Reference-only material, not part of the app — never commit/push
 /New folder (2)/
+
+# backend/ is only tracked on the backend-nestjs branch. These build
+# artifacts land on disk regardless of which branch is checked out, so they
+# need to be ignored at the repo root too — otherwise switching to a branch
+# that doesn't track backend/ leaves them as untracked noise (backend/.gitignore
+# disappears along with everything else backend-nestjs-only).
+/backend/node_modules/
+/backend/dist/
+/backend/.env
+/backend/src/generated/
+/backend/*.tsbuildinfo
+/backend/coverage/

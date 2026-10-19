@@ -40,8 +40,6 @@ model LandingPage {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  orders Order[]
-
   @@map("landing_pages")
 }
 
@@ -62,19 +60,16 @@ enum OrderStatus {
   @@map("order_status")
 }
 
+// An order can carry multiple products (a real cart), unlike the old
+// single-landing-page model — so line items live in OrderItem, and the
+// order-level deliveryCharge is the max of each paid item's per-zone charge
+// (not a sum — one order shouldn't be charged shipping multiple times).
 model Order {
-  id            String       @id @default(uuid()) @db.Uuid
-  landingPageId String?      @map("landing_page_id") @db.Uuid
-  landingPage   LandingPage? @relation(fields: [landingPageId], references: [id], onDelete: SetNull)
+  id String @id @default(uuid()) @db.Uuid
 
   customerName String @map("customer_name")
   phone        String
   address      String
-
-  // 1–20 enforced at the application layer (DTO validation), not by a DB
-  // check constraint — matches the original Supabase schema's intent.
-  quantity  Int
-  unitPrice Int @map("unit_price")
 
   deliveryZone   DeliveryZone? @map("delivery_zone")
   deliveryCharge Int           @default(0) @map("delivery_charge")
@@ -88,9 +83,32 @@ model Order {
   createdAt   DateTime  @default(now()) @map("created_at")
   confirmedAt DateTime? @map("confirmed_at")
 
+  items OrderItem[]
+
   @@index([status])
   @@index([createdAt])
   @@map("orders")
+}
+
+model OrderItem {
+  id      String @id @default(uuid()) @db.Uuid
+  orderId String @map("order_id") @db.Uuid
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId String?  @map("product_id") @db.Uuid
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  // Snapshot at order time — shouldn't retroactively change if the product
+  // is later edited, re-priced, or deleted.
+  productName String @map("product_name")
+  unitPrice   Int    @map("unit_price")
+
+  // 1–20 enforced at the application layer (DTO validation), not by a DB
+  // check constraint.
+  quantity Int
+
+  @@index([orderId])
+  @@map("order_items")
 }
 
 // ---------- Catalog (Category / Product) ----------
@@ -132,7 +150,8 @@ model Product {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  images ProductImage[]
+  images     ProductImage[]
+  orderItems OrderItem[]
 
   @@index([categoryId])
   @@index([active])

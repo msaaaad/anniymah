@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import { paginate } from '../common/pagination.dto.js';
 import { PrismaService } from '../prisma/prisma.service.js';
 import type { Product } from '../generated/prisma/client.js';
 import { applyDiscount } from '../promotions/promotion-price.util.js';
@@ -92,20 +93,32 @@ export class OrdersService {
     return { zone: requestedZone, charge: Math.max(...paidProducts.map(chargeFor)) };
   }
 
-  list(query: ListOrdersQueryDto) {
-    return this.prisma.order.findMany({
-      where: {
-        ...(query.status && { status: query.status }),
-        ...(query.search && {
-          OR: [
-            { customerName: { contains: query.search, mode: 'insensitive' } },
-            { phone: { contains: query.search, mode: 'insensitive' } },
-          ],
-        }),
-      },
-      include: ORDER_INCLUDE,
-      orderBy: { createdAt: 'desc' },
-    });
+  async list(query: ListOrdersQueryDto) {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 20;
+
+    const where = {
+      ...(query.status && { status: query.status }),
+      ...(query.search && {
+        OR: [
+          { customerName: { contains: query.search, mode: 'insensitive' as const } },
+          { phone: { contains: query.search, mode: 'insensitive' as const } },
+        ],
+      }),
+    };
+
+    const [data, total] = await Promise.all([
+      this.prisma.order.findMany({
+        where,
+        include: ORDER_INCLUDE,
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.order.count({ where }),
+    ]);
+
+    return paginate(data, total, page, limit);
   }
 
   async updateStatus(id: string, dto: UpdateOrderStatusDto) {

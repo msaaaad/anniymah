@@ -1,8 +1,9 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsIn, IsOptional, IsString } from 'class-validator';
+import { PaginationQueryDto } from '../../common/pagination.dto.js';
 import { ORDER_STATUSES, type OrderStatusValue } from './update-order-status.dto.js';
 
-export class ListOrdersQueryDto {
+export class ListOrdersQueryDto extends PaginationQueryDto {
   @ApiPropertyOptional({ enum: ORDER_STATUSES })
   @IsOptional()
   @IsIn(ORDER_STATUSES)

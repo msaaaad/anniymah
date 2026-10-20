@@ -19,6 +19,15 @@ export function CategoryManager({ categories }: { categories: Category[] }) {
   const [editing, setEditing] = useState<Editing>(null);
   const [deleting, setDeleting] = useState<Category | null>(null);
   const [busy, setBusy] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const filtered = search.trim()
+    ? categories.filter(
+        (c) =>
+          c.name.toLowerCase().includes(search.trim().toLowerCase()) ||
+          c.slug.toLowerCase().includes(search.trim().toLowerCase())
+      )
+    : categories;
 
   async function confirmDelete() {
     if (!deleting) return;
@@ -49,9 +58,46 @@ export function CategoryManager({ categories }: { categories: Category[] }) {
         </div>
       </div>
 
+      {categories.length > 0 && (
+        <div className="mt-6 flex items-center gap-3">
+          <div className="relative flex-1 max-w-md">
+            <svg
+              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search categories by name or slug..."
+              aria-label="Search categories"
+              className={`${inputClass} pl-9`}
+            />
+          </div>
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch("")}
+              className="text-xs text-muted underline-offset-2 hover:text-text hover:underline"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+      )}
+
       {categories.length === 0 ? (
         <p className={`${cardClass} mt-6 p-8 text-center text-sm text-muted`}>
           No categories yet. Create one to start organising products.
+        </p>
+      ) : filtered.length === 0 ? (
+        <p className={`${cardClass} mt-6 p-8 text-center text-sm text-muted`}>
+          No categories found matching &quot;{search}&quot;.
         </p>
       ) : (
         <div className={`${cardClass} mt-6 overflow-x-auto`}>
@@ -70,7 +116,7 @@ export function CategoryManager({ categories }: { categories: Category[] }) {
               </tr>
             </thead>
             <tbody>
-              {categories.map((category) => (
+              {filtered.map((category) => (
                 <tr key={category.id} className="border-b border-border last:border-0">
                   <td className="px-4 py-3 font-medium">{category.name}</td>
                   <td className="px-4 py-3 text-muted">{category.slug}</td>

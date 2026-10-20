@@ -93,3 +93,27 @@ export interface Order {
   confirmedAt: string | null;
   items: OrderItem[];
 }
+
+export interface HeroBanner {
+  id: string;
+  title: string;
+  subtitle: string;
+  imageUrl: string;
+  ctaLabel: string;
+  ctaUrl: string;
+  position: number;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Promotion {
+  id: string;
+  name: string;
+  discountPercent: number;
+  startsAt: string;
+  endsAt: string;
+  active: boolean;
+  createdAt: string;
+  updatedAt: string;
+}

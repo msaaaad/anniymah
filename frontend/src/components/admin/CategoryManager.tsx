@@ -10,7 +10,7 @@ import type { Category } from "@/lib/api-types";
 import { slugify } from "@/lib/slug";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { Modal } from "@/components/admin/Modal";
-import { btnDangerOutline, btnGhost, btnLink, btnPrimary, cardClass, inputClass, labelClass } from "@/components/admin/styles";
+import { btnGhost, btnIconDanger, btnIconEdit, btnLink, btnPrimary, cardClass, inputClass, labelClass } from "@/components/admin/styles";
 
 type Editing = { mode: "create" } | { mode: "edit"; category: Category } | null;
 
@@ -75,12 +75,28 @@ export function CategoryManager({ categories }: { categories: Category[] }) {
                   <td className="px-4 py-3 font-medium">{category.name}</td>
                   <td className="px-4 py-3 text-muted">{category.slug}</td>
                   <td className="px-4 py-3">
-                    <div className="flex justify-end gap-4">
-                      <button type="button" className={btnLink} onClick={() => setEditing({ mode: "edit", category })}>
-                        Edit
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        type="button"
+                        title="Edit category"
+                        aria-label="Edit category"
+                        className={btnIconEdit}
+                        onClick={() => setEditing({ mode: "edit", category })}
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
                       </button>
-                      <button type="button" className={btnDangerOutline} onClick={() => setDeleting(category)}>
-                        Delete
+                      <button
+                        type="button"
+                        title="Delete category"
+                        aria-label="Delete category"
+                        className={btnIconDanger}
+                        onClick={() => setDeleting(category)}
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
                       </button>
                     </div>
                   </td>

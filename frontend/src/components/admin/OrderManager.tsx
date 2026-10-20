@@ -19,7 +19,6 @@ interface OrderManagerProps {
   page?: number;
   totalPages?: number;
   total?: number;
-  hrefFor?: (page: number) => string;
 }
 
 const STATUS_CONFIG: Record<
@@ -57,13 +56,21 @@ export function OrderManager({
   page,
   totalPages,
   total,
-  hrefFor,
 }: OrderManagerProps) {
   const router = useRouter();
   const [deleting, setDeleting] = useState<Order | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [busyDelete, setBusyDelete] = useState(false);
+
+  function hrefFor(targetPage: number) {
+    const q = new URLSearchParams();
+    if (currentSearch) q.set("search", currentSearch);
+    if (currentStatus && currentStatus !== "all") q.set("status", currentStatus);
+    if (targetPage > 1) q.set("page", String(targetPage));
+    const qs = q.toString();
+    return `/admin/orders${qs ? `?${qs}` : ""}`;
+  }
 
   async function handleStatusChange(orderId: string, newStatus: OrderStatus) {
     setUpdatingId(orderId);

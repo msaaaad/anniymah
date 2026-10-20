@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { apiJson } from "@/lib/api-client";
@@ -8,12 +9,17 @@ import { errorMessages } from "@/lib/api-error";
 import type { Order, OrderStatus } from "@/lib/api-types";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { Modal } from "@/components/admin/Modal";
+import { Pagination } from "@/components/admin/Pagination";
 import { btnGhost, btnIconDanger, cardClass, inputClass } from "@/components/admin/styles";
 
 interface OrderManagerProps {
   orders: Order[];
   currentSearch?: string;
   currentStatus?: string;
+  page?: number;
+  totalPages?: number;
+  total?: number;
+  hrefFor?: (page: number) => string;
 }
 
 const STATUS_CONFIG: Record<
@@ -44,7 +50,15 @@ const STATUS_CONFIG: Record<
 
 const ALL_STATUSES: OrderStatus[] = ["pending", "confirmed", "delivered", "cancelled", "rejected"];
 
-export function OrderManager({ orders, currentSearch = "", currentStatus = "" }: OrderManagerProps) {
+export function OrderManager({
+  orders,
+  currentSearch = "",
+  currentStatus = "",
+  page,
+  totalPages,
+  total,
+  hrefFor,
+}: OrderManagerProps) {
   const router = useRouter();
   const [deleting, setDeleting] = useState<Order | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -115,6 +129,11 @@ export function OrderManager({ orders, currentSearch = "", currentStatus = "" }:
         <button type="submit" className={btnGhost}>
           Apply
         </button>
+        {(currentSearch || currentStatus) && (
+          <Link href="/admin/orders" className="self-center text-xs text-muted underline-offset-2 hover:text-text hover:underline sm:col-span-3">
+            Clear filters
+          </Link>
+        )}
       </form>
 
       {/* Orders Table */}
@@ -224,6 +243,10 @@ export function OrderManager({ orders, currentSearch = "", currentStatus = "" }:
             </tbody>
           </table>
         </div>
+      )}
+
+      {page && totalPages && total !== undefined && hrefFor && (
+        <Pagination page={page} totalPages={totalPages} total={total} hrefFor={hrefFor} />
       )}
 
       {/* Order Details Modal */}

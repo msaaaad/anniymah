@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { apiJson } from "@/lib/api-client";
 import { errorMessages } from "@/lib/api-error";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
-import { btnLink } from "@/components/admin/styles";
+import { btnDangerOutline } from "@/components/admin/styles";
 
 export function DeleteProductButton({ id, name }: { id: string; name: string }) {
   const router = useRouter();
@@ -29,7 +29,7 @@ export function DeleteProductButton({ id, name }: { id: string; name: string }) 
 
   return (
     <>
-      <button type="button" className={btnLink} onClick={() => setOpen(true)}>
+      <button type="button" className={btnDangerOutline} onClick={() => setOpen(true)}>
         Delete
       </button>
       <ConfirmDialog

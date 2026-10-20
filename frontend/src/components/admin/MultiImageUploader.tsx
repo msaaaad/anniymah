@@ -92,7 +92,7 @@ export function MultiImageUploader({ urls, onChange }: MultiImageUploaderProps) 
                   type="button"
                   aria-label={`Remove image ${index + 1}`}
                   onClick={() => onChange(urls.filter((_, i) => i !== index))}
-                  className="rounded-md px-2 py-1 text-xs text-danger-dark hover:bg-danger-tint"
+                  className="rounded-md border border-danger/60 px-2 py-0.5 text-xs font-medium text-danger transition-colors hover:bg-danger hover:text-white"
                 >
                   Remove
                 </button>

@@ -10,7 +10,7 @@ import type { Category } from "@/lib/api-types";
 import { slugify } from "@/lib/slug";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
 import { Modal } from "@/components/admin/Modal";
-import { btnGhost, btnLink, btnPrimary, cardClass, inputClass, labelClass } from "@/components/admin/styles";
+import { btnDangerOutline, btnGhost, btnLink, btnPrimary, cardClass, inputClass, labelClass } from "@/components/admin/styles";
 
 type Editing = { mode: "create" } | { mode: "edit"; category: Category } | null;
 
@@ -79,7 +79,7 @@ export function CategoryManager({ categories }: { categories: Category[] }) {
                       <button type="button" className={btnLink} onClick={() => setEditing({ mode: "edit", category })}>
                         Edit
                       </button>
-                      <button type="button" className={btnLink} onClick={() => setDeleting(category)}>
+                      <button type="button" className={btnDangerOutline} onClick={() => setDeleting(category)}>
                         Delete
                       </button>
                     </div>

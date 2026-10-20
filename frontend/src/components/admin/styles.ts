@@ -8,7 +8,16 @@ export const btnDanger =
   "inline-flex items-center justify-center gap-2 rounded-[8px] border border-danger bg-transparent px-4 py-2 text-sm font-medium text-danger transition-colors hover:bg-danger hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger disabled:cursor-not-allowed disabled:opacity-60";
 
 export const btnDangerOutline =
-  "inline-flex items-center justify-center gap-1.5 rounded-[8px] border border-danger/70 bg-transparent px-2.5 py-1 text-xs sm:text-sm font-medium text-danger transition-colors hover:bg-danger hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger disabled:cursor-not-allowed disabled:opacity-60";
+  "inline-flex items-center justify-center gap-1.5 rounded-[8px] border border-danger/70 bg-surface px-3 py-1.5 text-xs sm:text-sm font-medium text-danger shadow-2xs transition-colors hover:bg-danger hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger disabled:cursor-not-allowed disabled:opacity-60";
+
+export const btnEditOutline =
+  "inline-flex items-center justify-center gap-1.5 rounded-[8px] border border-emerald-600/70 bg-surface px-3 py-1.5 text-xs sm:text-sm font-medium text-emerald-700 shadow-2xs transition-colors hover:bg-emerald-600 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 disabled:cursor-not-allowed disabled:opacity-60";
+
+export const btnIconEdit =
+  "inline-flex h-8 w-8 items-center justify-center rounded-[8px] border border-emerald-600/70 bg-surface text-emerald-700 shadow-2xs transition-colors hover:bg-emerald-600 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600 disabled:cursor-not-allowed disabled:opacity-60";
+
+export const btnIconDanger =
+  "inline-flex h-8 w-8 items-center justify-center rounded-[8px] border border-danger/70 bg-surface text-danger shadow-2xs transition-colors hover:bg-danger hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger disabled:cursor-not-allowed disabled:opacity-60";
 
 export const btnLink =
   "text-sm text-muted underline-offset-2 transition-colors hover:text-sage-dark hover:underline focus-visible:outline-2 focus-visible:outline-sage";

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { DeleteProductButton } from "@/components/admin/DeleteProductButton";
 import { Pagination } from "@/components/admin/Pagination";
-import { btnGhost, btnLink, btnPrimary, cardClass, inputClass } from "@/components/admin/styles";
+import { btnGhost, btnIconEdit, btnLink, btnPrimary, cardClass, inputClass } from "@/components/admin/styles";
 import { serverFetch } from "@/lib/api-server";
 import { PRODUCT_SORTS, type Category, type Paginated, type Product, type ProductSort } from "@/lib/api-types";
 
@@ -149,9 +149,16 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
                     </span>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex justify-end gap-4">
-                      <Link href={`/admin/products/${product.slug}/edit`} className={btnLink}>
-                        Edit
+                    <div className="flex items-center justify-end gap-2">
+                      <Link
+                        href={`/admin/products/${product.slug}/edit`}
+                        title="Edit product"
+                        aria-label="Edit product"
+                        className={btnIconEdit}
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
                       </Link>
                       <DeleteProductButton id={product.id} name={product.name} />
                     </div>

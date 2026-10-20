@@ -62,3 +62,34 @@ export interface ProductPayload {
   active: boolean;
   images: string[];
 }
+
+export const ORDER_STATUSES = ["pending", "confirmed", "delivered", "cancelled", "rejected"] as const;
+export type OrderStatus = (typeof ORDER_STATUSES)[number];
+
+export type DeliveryZone = "inside_dhaka" | "outside_dhaka";
+
+export interface OrderItem {
+  id: string;
+  orderId: string;
+  productId: string | null;
+  productName: string;
+  unitPrice: number;
+  quantity: number;
+}
+
+export interface Order {
+  id: string;
+  customerId: string | null;
+  customerName: string;
+  phone: string;
+  address: string;
+  deliveryZone: DeliveryZone | null;
+  deliveryCharge: number;
+  total: number;
+  notes: string;
+  status: OrderStatus;
+  courierTrackingId: string | null;
+  createdAt: string;
+  confirmedAt: string | null;
+  items: OrderItem[];
+}

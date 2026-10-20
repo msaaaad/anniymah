@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { apiJson } from "@/lib/api-client";
 import { errorMessages } from "@/lib/api-error";
 import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
-import { btnLink, cardClass } from "@/components/admin/styles";
+import { btnDangerOutline, btnLink, cardClass } from "@/components/admin/styles";
 
 export interface TrashRow {
   id: string;
@@ -99,7 +99,7 @@ export function TrashTable({ rows, endpoint, noun }: TrashTableProps) {
                     <button type="button" className={btnLink} disabled={busyId === row.id} onClick={() => restore(row)}>
                       Restore
                     </button>
-                    <button type="button" className={btnLink} disabled={busyId === row.id} onClick={() => setPurging(row)}>
+                    <button type="button" className={btnDangerOutline} disabled={busyId === row.id} onClick={() => setPurging(row)}>
                       Delete forever
                     </button>
                   </div>

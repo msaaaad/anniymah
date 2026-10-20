@@ -18,11 +18,11 @@ services:
 
   backend:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     restart: unless-stopped
     env_file:
-      - .env
+      - ./backend/.env
     environment:
       DATABASE_URL: postgresql://anniymah:anniymah_dev@postgres:5432/anniymah?schema=public
     ports:

@@ -1,6 +1,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
-import { IsBoolean, IsEmail, IsInt, IsOptional, IsString, Min, ValidateIf } from 'class-validator';
+import { IsBoolean, IsEmail, IsInt, IsOptional, IsString, Min, ValidateIf, ValidateNested } from 'class-validator';
+import { ThemeColorsDto } from './theme-colors.dto.js';
 
 export class UpdateSettingsDto {
   @ApiPropertyOptional({ example: 60 })
@@ -53,4 +54,13 @@ export class UpdateSettingsDto {
   @Min(0)
   @Type(() => Number)
   lowStockThreshold?: number;
+
+  @ApiPropertyOptional({
+    type: ThemeColorsDto,
+    description: 'Storefront colors, only the sent keys change. Each value is a 6 digit hex color.',
+  })
+  @IsOptional()
+  @ValidateNested()
+  @Type(() => ThemeColorsDto)
+  themeColors?: ThemeColorsDto;
 }

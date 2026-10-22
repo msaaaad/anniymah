@@ -263,6 +263,8 @@ model StoreSetting {
 
   lowStockThreshold Int @default(5) @map("low_stock_threshold")
 
+  themeColors Json @default("{}") @map("theme_colors")
+
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@map("store_settings")

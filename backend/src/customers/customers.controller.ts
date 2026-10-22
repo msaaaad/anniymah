@@ -1,12 +1,15 @@
-import { Body, Controller, Get, HttpCode, Post, Res, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, Post, Query, Res, UseGuards } from '@nestjs/common';
 import { ApiCookieAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
 import type { Response } from 'express';
+import { SessionGuard } from '../auth/session.guard.js';
+import { SESSION_COOKIE } from '../auth/session.service.js';
 import { CurrentCustomerId } from './current-customer-id.decorator.js';
 import { CUSTOMER_SESSION_COOKIE, CustomerSessionService } from './customer-session.service.js';
 import { CustomerSessionGuard } from './customer-session.guard.js';
 import { CustomersService } from './customers.service.js';
 import { LoginCustomerDto } from './dto/login-customer.dto.js';
+import { ListCustomersQueryDto } from './dto/list-customers.query.dto.js';
 import { RegisterCustomerDto } from './dto/register-customer.dto.js';
 
 const THIRTY_DAYS_MS = 1000 * 60 * 60 * 24 * 30;
@@ -18,6 +21,14 @@ export class CustomersController {
     private readonly customers: CustomersService,
     private readonly sessionService: CustomerSessionService,
   ) {}
+
+  @Get()
+  @UseGuards(SessionGuard)
+  @ApiCookieAuth(SESSION_COOKIE)
+  @ApiOperation({ summary: 'List customers with order count and total spent on delivered orders (admin only)' })
+  list(@Query() query: ListCustomersQueryDto) {
+    return this.customers.list(query);
+  }
 
   @Post('register')
   @HttpCode(201)

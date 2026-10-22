@@ -15,6 +15,9 @@ import { OrdersModule } from './orders/orders.module.js';
 import { CustomersModule } from './customers/customers.module.js';
 import { HeroBannersModule } from './hero-banners/hero-banners.module.js';
 import { PromotionsModule } from './promotions/promotions.module.js';
+import { LandingPagesModule } from './landing-pages/landing-pages.module.js';
+import { SettingsModule } from './settings/settings.module.js';
+import { AnalyticsModule } from './analytics/analytics.module.js';
 
 const DEFAULT_RATE_LIMIT = { name: 'default', ttl: 60_000, limit: 60 };
 
@@ -33,6 +36,9 @@ const DEFAULT_RATE_LIMIT = { name: 'default', ttl: 60_000, limit: 60 };
     OrdersModule,
     HeroBannersModule,
     PromotionsModule,
+    LandingPagesModule,
+    SettingsModule,
+    AnalyticsModule,
   ],
   controllers: [AppController],
   providers: [AppService, { provide: APP_GUARD, useClass: ThrottlerGuard }],

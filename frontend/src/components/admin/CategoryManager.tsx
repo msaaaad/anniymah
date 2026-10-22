@@ -1,0 +1,279 @@
+"use client";
+
+import { FormEvent, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { apiJson } from "@/lib/api-client";
+import { errorMessages } from "@/lib/api-error";
+import type { Category } from "@/lib/api-types";
+import { slugify } from "@/lib/slug";
+import { ConfirmDialog } from "@/components/admin/ConfirmDialog";
+import { Modal } from "@/components/admin/Modal";
+import { btnGhost, btnIconDanger, btnIconEdit, btnLink, btnPrimary, cardClass, inputClass, labelClass } from "@/components/admin/styles";
+
+type Editing = { mode: "create" } | { mode: "edit"; category: Category } | null;
+
+export function CategoryManager({ categories }: { categories: Category[] }) {
+  const router = useRouter();
+  const [editing, setEditing] = useState<Editing>(null);
+  const [deleting, setDeleting] = useState<Category | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const filtered = search.trim()
+    ? categories.filter(
+        (c) =>
+          c.name.toLowerCase().includes(search.trim().toLowerCase()) ||
+          c.slug.toLowerCase().includes(search.trim().toLowerCase())
+      )
+    : categories;
+
+  async function confirmDelete() {
+    if (!deleting) return;
+    setBusy(true);
+    try {
+      await apiJson(`/categories/${deleting.id}`, "DELETE");
+      toast.success(`"${deleting.name}" moved to trash`);
+      setDeleting(null);
+      router.refresh();
+    } catch (err) {
+      toast.error(errorMessages(err).join(", "));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="font-heading text-2xl font-semibold">Categories</h1>
+        <div className="flex gap-3">
+          <Link href="/admin/categories/trash" className={btnGhost}>
+            Trash
+          </Link>
+          <button type="button" onClick={() => setEditing({ mode: "create" })} className={btnPrimary}>
+            New category
+          </button>
+        </div>
+      </div>
+
+      {categories.length > 0 && (
+        <div className="mt-6 flex items-center gap-3">
+          <div className="relative flex-1 max-w-md">
+            <svg
+              className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search categories by name or slug..."
+              aria-label="Search categories"
+              className={`${inputClass} pl-9`}
+            />
+          </div>
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch("")}
+              className="text-xs text-muted underline-offset-2 hover:text-text hover:underline"
+            >
+              Clear
+            </button>
+          )}
+        </div>
+      )}
+
+      {categories.length === 0 ? (
+        <p className={`${cardClass} mt-6 p-8 text-center text-sm text-muted`}>
+          No categories yet. Create one to start organising products.
+        </p>
+      ) : filtered.length === 0 ? (
+        <p className={`${cardClass} mt-6 p-8 text-center text-sm text-muted`}>
+          No categories found matching &quot;{search}&quot;.
+        </p>
+      ) : (
+        <div className={`${cardClass} mt-6 overflow-x-auto`}>
+          <table className="w-full text-left text-sm">
+            <thead className="border-b border-border text-[13px] text-muted">
+              <tr>
+                <th scope="col" className="px-4 py-3 font-medium">
+                  Name
+                </th>
+                <th scope="col" className="px-4 py-3 font-medium">
+                  Slug
+                </th>
+                <th scope="col" className="px-4 py-3 text-right font-medium">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((category) => (
+                <tr key={category.id} className="border-b border-border last:border-0">
+                  <td className="px-4 py-3 font-medium">{category.name}</td>
+                  <td className="px-4 py-3 text-muted">{category.slug}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center justify-end gap-2">
+                      <button
+                        type="button"
+                        title="Edit category"
+                        aria-label="Edit category"
+                        className={btnIconEdit}
+                        onClick={() => setEditing({ mode: "edit", category })}
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                        </svg>
+                      </button>
+                      <button
+                        type="button"
+                        title="Delete category"
+                        aria-label="Delete category"
+                        className={btnIconDanger}
+                        onClick={() => setDeleting(category)}
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <Modal
+        open={editing !== null}
+        title={editing?.mode === "edit" ? "Edit category" : "New category"}
+        onClose={() => setEditing(null)}
+      >
+        {editing && (
+          <CategoryForm
+            key={editing.mode === "edit" ? editing.category.id : "new"}
+            category={editing.mode === "edit" ? editing.category : undefined}
+            onCancel={() => setEditing(null)}
+            onSaved={() => {
+              setEditing(null);
+              router.refresh();
+            }}
+          />
+        )}
+      </Modal>
+
+      <ConfirmDialog
+        open={deleting !== null}
+        title="Move to trash?"
+        message={
+          <>
+            <strong>{deleting?.name}</strong> will be moved to the trash. You can restore it later.
+          </>
+        }
+        confirmLabel="Move to trash"
+        busy={busy}
+        onConfirm={confirmDelete}
+        onCancel={() => setDeleting(null)}
+      />
+    </>
+  );
+}
+
+interface CategoryFormProps {
+  category?: Category;
+  onCancel: () => void;
+  onSaved: () => void;
+}
+
+function CategoryForm({ category, onCancel, onSaved }: CategoryFormProps) {
+  const [name, setName] = useState(category?.name ?? "");
+  const [slug, setSlug] = useState(category?.slug ?? "");
+  const [slugTouched, setSlugTouched] = useState(Boolean(category));
+  const [errors, setErrors] = useState<string[]>([]);
+  const [submitting, setSubmitting] = useState(false);
+
+  function handleNameChange(value: string) {
+    setName(value);
+    if (!slugTouched) setSlug(slugify(value));
+  }
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setSubmitting(true);
+    setErrors([]);
+    try {
+      if (category) {
+        await apiJson(`/categories/${category.id}`, "PATCH", { name: name.trim(), slug });
+        toast.success("Category updated");
+      } else {
+        await apiJson("/categories", "POST", { name: name.trim(), slug });
+        toast.success("Category created");
+      }
+      onSaved();
+    } catch (err) {
+      setErrors(errorMessages(err));
+      setSubmitting(false);
+    }
+  }
+
+  return (
+    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="category-name" className={labelClass}>
+          Name
+        </label>
+        <input
+          id="category-name"
+          required
+          autoFocus
+          value={name}
+          onChange={(e) => handleNameChange(e.target.value)}
+          className={inputClass}
+        />
+      </div>
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="category-slug" className={labelClass}>
+          Slug
+        </label>
+        <input
+          id="category-slug"
+          required
+          value={slug}
+          pattern="[a-z0-9]+(-[a-z0-9]+)*"
+          title="Lowercase letters, numbers and single hyphens"
+          onChange={(e) => {
+            setSlugTouched(true);
+            setSlug(e.target.value);
+          }}
+          className={inputClass}
+        />
+      </div>
+
+      {errors.length > 0 && (
+        <ul role="alert" className="list-disc pl-5 text-sm text-danger-dark">
+          {errors.map((message) => (
+            <li key={message}>{message}</li>
+          ))}
+        </ul>
+      )}
+
+      <div className="mt-2 flex justify-end gap-3">
+        <button type="button" onClick={onCancel} className={btnGhost}>
+          Cancel
+        </button>
+        <button type="submit" disabled={submitting} className={btnPrimary}>
+          {submitting ? "Saving..." : category ? "Save changes" : "Create category"}
+        </button>
+      </div>
+    </form>
+  );
+}

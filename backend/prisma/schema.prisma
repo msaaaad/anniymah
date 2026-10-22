@@ -1,0 +1,246 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model LandingPage {
+  id           String @id @default(uuid()) @db.Uuid
+  slug         String @unique
+  title        String @default("")
+  description  String @default("")
+  price        Int    @default(0)
+  regularPrice Int    @default(0) @map("regular_price")
+  phone        String @default("")
+  imageUrl     String @default("") @map("image_url")
+
+  collectionEnabled Boolean @default(false) @map("collection_enabled")
+  collectionTitle   String  @default("") @map("collection_title")
+  collectionItems   Json    @default("[]") @map("collection_items")
+
+  featuresEnabled  Boolean @default(false) @map("features_enabled")
+  featuresTitle    String  @default("") @map("features_title")
+  featuresSubtitle String  @default("") @map("features_subtitle")
+  features         Json    @default("[]")
+
+  shippingBarEnabled Boolean @default(false) @map("shipping_bar_enabled")
+  shippingBarItems   Json    @default("[]") @map("shipping_bar_items")
+
+  freeDelivery               Boolean @default(true) @map("free_delivery")
+  deliveryChargeInsideDhaka  Int     @default(0) @map("delivery_charge_inside_dhaka")
+  deliveryChargeOutsideDhaka Int     @default(0) @map("delivery_charge_outside_dhaka")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("landing_pages")
+}
+
+enum DeliveryZone {
+  inside_dhaka
+  outside_dhaka
+
+  @@map("delivery_zone")
+}
+
+enum OrderStatus {
+  pending
+  confirmed
+  delivered
+  cancelled
+  rejected
+
+  @@map("order_status")
+}
+
+model Order {
+  id String @id @default(uuid()) @db.Uuid
+
+  customerId String?   @map("customer_id") @db.Uuid
+  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
+
+  customerName String @map("customer_name")
+  phone        String
+  address      String
+
+  deliveryZone   DeliveryZone? @map("delivery_zone")
+  deliveryCharge Int           @default(0) @map("delivery_charge")
+  total          Int
+
+  notes  String      @default("")
+  status OrderStatus @default(pending)
+
+  courierTrackingId String? @map("courier_tracking_id")
+
+  createdAt   DateTime  @default(now()) @map("created_at")
+  confirmedAt DateTime? @map("confirmed_at")
+
+  items OrderItem[]
+
+  @@index([status])
+  @@index([createdAt])
+  @@map("orders")
+}
+
+model OrderItem {
+  id      String @id @default(uuid()) @db.Uuid
+  orderId String @map("order_id") @db.Uuid
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  productId String?  @map("product_id") @db.Uuid
+  product   Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
+
+  productName String @map("product_name")
+  unitPrice   Int    @map("unit_price")
+
+  quantity Int
+
+  @@index([orderId])
+  @@map("order_items")
+}
+
+model Category {
+  id   String @id @default(uuid()) @db.Uuid
+  name String
+  slug String @unique
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  products Product[]
+
+  @@index([deletedAt])
+  @@map("categories")
+}
+
+model Product {
+  id         String    @id @default(uuid()) @db.Uuid
+  categoryId String?   @map("category_id") @db.Uuid
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  name        String
+  slug        String @unique
+  description String @default("")
+
+  price        Int @default(0)
+  regularPrice Int @default(0) @map("regular_price")
+
+  freeDelivery               Boolean @default(true) @map("free_delivery")
+  deliveryChargeInsideDhaka  Int     @default(0) @map("delivery_charge_inside_dhaka")
+  deliveryChargeOutsideDhaka Int     @default(0) @map("delivery_charge_outside_dhaka")
+
+  active Boolean @default(true)
+
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  deletedAt DateTime? @map("deleted_at")
+
+  images     ProductImage[]
+  orderItems OrderItem[]
+  cartItems  CartItem[]
+
+  @@index([categoryId])
+  @@index([active])
+  @@index([deletedAt])
+  @@map("products")
+}
+
+model ProductImage {
+  id        String  @id @default(uuid()) @db.Uuid
+  productId String  @map("product_id") @db.Uuid
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  url      String
+  position Int    @default(0)
+
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@index([productId])
+  @@map("product_images")
+}
+
+model Customer {
+  id           String  @id @default(uuid()) @db.Uuid
+  phone        String  @unique
+  email        String? @unique
+  name         String  @default("")
+  passwordHash String  @map("password_hash")
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  cart   Cart?
+  orders Order[]
+
+  @@map("customers")
+}
+
+model Cart {
+  id         String   @id @default(uuid()) @db.Uuid
+  customerId String   @unique @map("customer_id") @db.Uuid
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  items CartItem[]
+
+  @@map("carts")
+}
+
+model CartItem {
+  id     String @id @default(uuid()) @db.Uuid
+  cartId String @map("cart_id") @db.Uuid
+  cart   Cart   @relation(fields: [cartId], references: [id], onDelete: Cascade)
+
+  productId String  @map("product_id") @db.Uuid
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  quantity Int @default(1)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@unique([cartId, productId])
+  @@map("cart_items")
+}
+
+model HeroBanner {
+  id       String @id @default(uuid()) @db.Uuid
+  title    String
+  subtitle String @default("")
+  imageUrl String @map("image_url")
+
+  ctaLabel String @default("") @map("cta_label")
+  ctaUrl   String @default("") @map("cta_url")
+
+  position Int     @default(0)
+  active   Boolean @default(true)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([active])
+  @@map("hero_banners")
+}
+
+model Promotion {
+  id              String @id @default(uuid()) @db.Uuid
+  name            String
+  discountPercent Int    @map("discount_percent")
+
+  startsAt DateTime @map("starts_at")
+  endsAt   DateTime @map("ends_at")
+
+  active Boolean @default(true)
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@index([startsAt, endsAt])
+  @@map("promotions")
+}

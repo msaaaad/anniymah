@@ -28,6 +28,7 @@ export interface Product {
   deliveryChargeInsideDhaka: number;
   deliveryChargeOutsideDhaka: number;
   active: boolean;
+  stock: number | null;
   createdAt: string;
   updatedAt: string;
   deletedAt: string | null;
@@ -60,6 +61,7 @@ export interface ProductPayload {
   deliveryChargeInsideDhaka: number;
   deliveryChargeOutsideDhaka: number;
   active: boolean;
+  stock: number | null;
   images: string[];
 }
 
@@ -116,4 +118,126 @@ export interface Promotion {
   active: boolean;
   createdAt: string;
   updatedAt: string;
+}
+
+export interface DashboardAnalytics {
+  revenue: {
+    total: number;
+    thisMonth: number;
+  };
+  ordersByStatus: Record<OrderStatus, number>;
+  totalOrders: number;
+  topProductsSource: "sales" | "latest";
+  topProducts: Array<{
+    productName: string;
+    unitsSold: number;
+    revenue: number;
+  }>;
+  salesOverTime: Array<{
+    date: string;
+    orders: number;
+    revenue: number;
+  }>;
+  stock: {
+    lowStockThreshold: number;
+    lowStockCount: number;
+    outOfStockCount: number;
+  };
+}
+
+export interface ThemeColors {
+  bg: string;
+  surface: string;
+  sage: string;
+  sageDark: string;
+  sageTint: string;
+  rose: string;
+  roseDark: string;
+  roseTint: string;
+  text: string;
+  muted: string;
+  border: string;
+  mediaBg: string;
+}
+
+export interface ThemeColorDefault {
+  key: keyof ThemeColors;
+  defaultColor: string;
+  usage: string;
+}
+
+export interface StoreSettings {
+  id: number;
+  defaultDeliveryChargeInsideDhaka: number;
+  defaultDeliveryChargeOutsideDhaka: number;
+  whatsappNumber: string;
+  contactPhone: string;
+  contactEmail: string;
+  contactAddress: string;
+  announcementText: string;
+  announcementActive: boolean;
+  lowStockThreshold: number;
+  themeColors: ThemeColors;
+  updatedAt: string;
+}
+
+export interface Customer {
+  id: string;
+  phone: string;
+  email: string | null;
+  name: string;
+  createdAt: string;
+  orderCount: number;
+  totalSpent: number;
+}
+
+export interface LandingPageItem {
+  [key: string]: unknown;
+}
+
+export interface LandingPageAdmin {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  price: number;
+  regularPrice: number;
+  phone: string;
+  imageUrl: string;
+  collectionEnabled: boolean;
+  collectionTitle: string;
+  collectionItems: LandingPageItem[];
+  featuresEnabled: boolean;
+  featuresTitle: string;
+  featuresSubtitle: string;
+  features: LandingPageItem[];
+  shippingBarEnabled: boolean;
+  shippingBarItems: LandingPageItem[];
+  freeDelivery: boolean;
+  deliveryChargeInsideDhaka: number;
+  deliveryChargeOutsideDhaka: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface LandingPagePayload {
+  slug: string;
+  title?: string;
+  description?: string;
+  price?: number;
+  regularPrice?: number;
+  phone?: string;
+  imageUrl?: string;
+  collectionEnabled?: boolean;
+  collectionTitle?: string;
+  collectionItems?: LandingPageItem[];
+  featuresEnabled?: boolean;
+  featuresTitle?: string;
+  featuresSubtitle?: string;
+  features?: LandingPageItem[];
+  shippingBarEnabled?: boolean;
+  shippingBarItems?: LandingPageItem[];
+  freeDelivery?: boolean;
+  deliveryChargeInsideDhaka?: number;
+  deliveryChargeOutsideDhaka?: number;
 }

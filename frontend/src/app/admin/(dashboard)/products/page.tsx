@@ -3,7 +3,7 @@ import { DeleteProductButton } from "@/components/admin/DeleteProductButton";
 import { Pagination } from "@/components/admin/Pagination";
 import { btnGhost, btnIconEdit, btnLink, btnPrimary, cardClass, inputClass } from "@/components/admin/styles";
 import { serverFetch } from "@/lib/api-server";
-import { PRODUCT_SORTS, type Category, type Paginated, type Product, type ProductSort } from "@/lib/api-types";
+import { PRODUCT_SORTS, type Category, type Paginated, type Product, type ProductSort, type StoreSettings } from "@/lib/api-types";
 
 export const metadata = { title: "Products · Anniymah Admin" };
 
@@ -32,10 +32,12 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
   if (search) query.set("search", search);
   if (categoryId) query.set("categoryId", categoryId);
 
-  const [result, categories] = await Promise.all([
+  const [result, categories, settings] = await Promise.all([
     serverFetch<Paginated<Product>>(`/products?${query}`),
     serverFetch<Category[]>("/categories"),
+    serverFetch<StoreSettings>("/settings").catch(() => ({ lowStockThreshold: 5 } as StoreSettings)),
   ]);
+  const lowStockThreshold = settings.lowStockThreshold ?? 5;
 
   function hrefFor(target: number) {
     const next = new URLSearchParams({ page: String(target), sort });
@@ -108,6 +110,9 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
                   Price
                 </th>
                 <th scope="col" className="px-4 py-3 font-medium">
+                  Stock
+                </th>
+                <th scope="col" className="px-4 py-3 font-medium">
                   Status
                 </th>
                 <th scope="col" className="px-4 py-3 text-right font-medium">
@@ -137,6 +142,25 @@ export default async function ProductsPage({ searchParams }: { searchParams: Pro
                     <span className="font-medium text-sage-dark">৳{product.price}</span>
                     {product.regularPrice > product.price && (
                       <span className="ml-2 text-xs text-muted line-through">৳{product.regularPrice}</span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3">
+                    {product.stock === null || product.stock === undefined ? (
+                      <span className="rounded-full bg-stone-100 px-2.5 py-0.5 text-xs font-medium text-stone-500">
+                        Not tracked
+                      </span>
+                    ) : product.stock === 0 ? (
+                      <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-bold text-red-800">
+                        Out of stock (0)
+                      </span>
+                    ) : product.stock <= lowStockThreshold ? (
+                      <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-bold text-amber-800">
+                        Low stock ({product.stock})
+                      </span>
+                    ) : (
+                      <span className="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
+                        {product.stock} in stock
+                      </span>
                     )}
                   </td>
                   <td className="px-4 py-3">

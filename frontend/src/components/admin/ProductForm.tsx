@@ -33,6 +33,8 @@ export function ProductForm({ categories, product }: ProductFormProps) {
   const [freeDelivery, setFreeDelivery] = useState(product?.freeDelivery ?? true);
   const [chargeInside, setChargeInside] = useState(String(product?.deliveryChargeInsideDhaka ?? 0));
   const [chargeOutside, setChargeOutside] = useState(String(product?.deliveryChargeOutsideDhaka ?? 0));
+  const [trackStock, setTrackStock] = useState(product?.stock !== null && product?.stock !== undefined);
+  const [stock, setStock] = useState(product?.stock != null ? String(product.stock) : "0");
   const [active, setActive] = useState(product?.active ?? true);
   const [images, setImages] = useState<string[]>(product?.images.map((image) => image.url) ?? []);
   const [errors, setErrors] = useState<string[]>([]);
@@ -59,6 +61,7 @@ export function ProductForm({ categories, product }: ProductFormProps) {
       deliveryChargeInsideDhaka: toInt(chargeInside),
       deliveryChargeOutsideDhaka: toInt(chargeOutside),
       active,
+      stock: trackStock ? Math.max(0, parseInt(stock, 10) || 0) : null,
       images,
     };
 
@@ -241,6 +244,42 @@ export function ProductForm({ categories, product }: ProductFormProps) {
               />
             </div>
           </>
+        )}
+
+        <div className="flex flex-col gap-2 sm:col-span-2 pt-3 border-t border-border">
+          <label className="flex items-center gap-2.5 text-sm font-medium">
+            <input
+              type="checkbox"
+              checked={trackStock}
+              onChange={(e) => setTrackStock(e.target.checked)}
+              className="h-4 w-4 accent-sage"
+            />
+            Track inventory stock for this product
+          </label>
+          <p className="text-xs text-muted">
+            {trackStock
+              ? "When stock reaches 0, product shows Out of Stock. When at or below low stock threshold, an alert badge appears."
+              : "Inventory is not tracked (shown as available for purchase indefinitely)."}
+          </p>
+        </div>
+
+        {trackStock && (
+          <div className="flex flex-col gap-1.5 sm:col-span-1">
+            <label htmlFor="product-stock" className={labelClass}>
+              Available Stock (Units)
+            </label>
+            <input
+              id="product-stock"
+              type="number"
+              inputMode="numeric"
+              min={0}
+              step={1}
+              required={trackStock}
+              value={stock}
+              onChange={(e) => setStock(e.target.value)}
+              className={inputClass}
+            />
+          </div>
         )}
       </section>
 

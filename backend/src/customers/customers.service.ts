@@ -2,8 +2,10 @@ import { BadRequestException, ConflictException, Injectable, UnauthorizedExcepti
 import * as bcrypt from 'bcryptjs';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { isValidBangladeshiPhone, normalizePhone } from '../common/phone.util.js';
+import { paginate } from '../common/pagination.dto.js';
 import { RegisterCustomerDto } from './dto/register-customer.dto.js';
 import { LoginCustomerDto } from './dto/login-customer.dto.js';
+import { ListCustomersQueryDto } from './dto/list-customers.query.dto.js';
 
 const SALT_ROUNDS = 10;
 
@@ -53,6 +55,58 @@ export class CustomersService {
     const customer = await this.prisma.customer.findUnique({ where: { id } });
     if (!customer) throw new UnauthorizedException();
     return this.toPublic(customer);
+  }
+
+  async list(query: ListCustomersQueryDto) {
+    const page = query.page ?? 1;
+    const limit = query.limit ?? 20;
+    const search = query.search?.trim();
+
+    const where = search
+      ? {
+          OR: [
+            { name: { contains: search, mode: 'insensitive' as const } },
+            { phone: { contains: search, mode: 'insensitive' as const } },
+            { email: { contains: search, mode: 'insensitive' as const } },
+          ],
+        }
+      : {};
+
+    const [customers, total] = await Promise.all([
+      this.prisma.customer.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+        select: { id: true, phone: true, email: true, name: true, createdAt: true },
+      }),
+      this.prisma.customer.count({ where }),
+    ]);
+
+    const customerIds = customers.map((customer) => customer.id);
+    const [orderCounts, deliveredTotals] = await Promise.all([
+      this.prisma.order.groupBy({
+        by: ['customerId'],
+        where: { customerId: { in: customerIds } },
+        _count: { _all: true },
+      }),
+      this.prisma.order.groupBy({
+        by: ['customerId'],
+        where: { customerId: { in: customerIds }, status: 'delivered' },
+        _sum: { total: true },
+      }),
+    ]);
+
+    const orderCountByCustomer = new Map(orderCounts.map((row) => [row.customerId, row._count._all]));
+    const totalSpentByCustomer = new Map(deliveredTotals.map((row) => [row.customerId, row._sum.total ?? 0]));
+
+    const data = customers.map((customer) => ({
+      ...customer,
+      orderCount: orderCountByCustomer.get(customer.id) ?? 0,
+      totalSpent: totalSpentByCustomer.get(customer.id) ?? 0,
+    }));
+
+    return paginate(data, total, page, limit);
   }
 
   private toPublic(customer: { id: string; phone: string; email: string | null; name: string }) {

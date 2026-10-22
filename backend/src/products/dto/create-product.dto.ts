@@ -73,6 +73,13 @@ export class CreateProductDto {
   @IsBoolean()
   active?: boolean;
 
+  @ApiPropertyOptional({ description: 'Units in stock, null or omitted means stock is not tracked', nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  @Type(() => Number)
+  stock?: number | null;
+
   @ApiPropertyOptional({
     description: 'Public URLs from POST /uploads, in display order',
     type: [String],

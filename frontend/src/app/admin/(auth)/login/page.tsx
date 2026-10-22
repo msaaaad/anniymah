@@ -22,8 +22,7 @@ export default function AdminLoginPage() {
         email: formData.get("email"),
         password: formData.get("password"),
       });
-      router.push("/admin/products");
-      router.refresh();
+      window.location.href = "/admin/products";
     } catch (err) {
       setError(errorMessages(err, "Login failed").join(", "));
       setSubmitting(false);
@@ -32,7 +31,7 @@ export default function AdminLoginPage() {
 
   return (
     <div className="flex min-h-screen flex-1 items-center justify-center bg-bg px-6">
-      <form onSubmit={handleSubmit} className={`${cardClass} w-full max-w-sm p-6`}>
+      <form method="POST" onSubmit={handleSubmit} className={`${cardClass} w-full max-w-sm p-6`}>
         {/* eslint-disable-next-line @next/next/no-img-element -- small static logo, no next/image config needed */}
         <img src="/logo-mark.webp" alt="" width={40} height={40} className="mb-3 rounded-lg" />
         <h1 className="font-heading text-xl font-semibold text-text">Admin Login</h1>

@@ -135,6 +135,8 @@ model Product {
 
   active Boolean @default(true)
 
+  stock Int?
+
   createdAt DateTime  @default(now()) @map("created_at")
   updatedAt DateTime  @updatedAt @map("updated_at")
   deletedAt DateTime? @map("deleted_at")
@@ -243,4 +245,25 @@ model Promotion {
 
   @@index([startsAt, endsAt])
   @@map("promotions")
+}
+
+model StoreSetting {
+  id Int @id @default(1)
+
+  defaultDeliveryChargeInsideDhaka  Int @default(0) @map("default_delivery_charge_inside_dhaka")
+  defaultDeliveryChargeOutsideDhaka Int @default(0) @map("default_delivery_charge_outside_dhaka")
+
+  whatsappNumber String @default("") @map("whatsapp_number")
+  contactPhone   String @default("") @map("contact_phone")
+  contactEmail   String @default("") @map("contact_email")
+  contactAddress String @default("") @map("contact_address")
+
+  announcementText   String  @default("") @map("announcement_text")
+  announcementActive Boolean @default(false) @map("announcement_active")
+
+  lowStockThreshold Int @default(5) @map("low_stock_threshold")
+
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("store_settings")
 }

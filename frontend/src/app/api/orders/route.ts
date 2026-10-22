@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createOrder, listOrders } from "@/lib/db";
+import { BACKEND_URL } from "@/lib/api-server";
+import { createOrder, getLandingPageById, listOrders } from "@/lib/db";
 import { isValidBangladeshiPhone, normalizePhone } from "@/lib/phone";
 import { SESSION_COOKIE, verifySessionToken } from "@/lib/session";
 
@@ -55,7 +56,50 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const order = await createOrder({
+    const page = await getLandingPageById(landingPageId);
+    if (!page) {
+      return NextResponse.json({ error: "Landing page not found" }, { status: 404 });
+    }
+
+    let resolvedZone: "inside_dhaka" | "outside_dhaka" | undefined = undefined;
+    let deliveryCharge = 0;
+    if (!page.freeDelivery) {
+      if (deliveryZone !== "inside_dhaka" && deliveryZone !== "outside_dhaka") {
+        return NextResponse.json({ error: "Please select a delivery area" }, { status: 400 });
+      }
+      resolvedZone = deliveryZone;
+      deliveryCharge =
+        resolvedZone === "inside_dhaka"
+          ? page.deliveryChargeInsideDhaka
+          : page.deliveryChargeOutsideDhaka;
+    }
+
+    // Save to the NestJS backend (PostgreSQL database)
+    const backendRes = await fetch(`${BACKEND_URL}/orders/landing-page`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        customerName,
+        phone: normalizePhone(phone),
+        address,
+        productName: page.title || "Landing Page Product",
+        unitPrice: page.price,
+        quantity,
+        deliveryZone: resolvedZone,
+        deliveryCharge,
+        notes,
+      }),
+    });
+
+    if (!backendRes.ok) {
+      const err = await backendRes.json().catch(() => null);
+      throw new Error(err?.message || "Failed to create order on backend");
+    }
+
+    const order = await backendRes.json();
+
+    // Also persist to Supabase in background for backwards compatibility
+    createOrder({
       landingPageId,
       customerName,
       phone: normalizePhone(phone),
@@ -63,7 +107,8 @@ export async function POST(request: NextRequest) {
       quantity,
       notes,
       deliveryZone,
-    });
+    }).catch(() => undefined);
+
     return NextResponse.json(order, { status: 201 });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to create order";

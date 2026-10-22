@@ -6,6 +6,7 @@ import { SessionGuard } from '../auth/session.guard.js';
 import { SESSION_COOKIE } from '../auth/session.service.js';
 import { CartService } from '../customers/cart.service.js';
 import { CUSTOMER_SESSION_COOKIE, CustomerSessionService } from '../customers/customer-session.service.js';
+import { CreateLandingPageOrderDto } from './dto/create-landing-page-order.dto.js';
 import { CreateOrderDto } from './dto/create-order.dto.js';
 import { ListOrdersQueryDto } from './dto/list-orders.query.dto.js';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto.js';
@@ -19,6 +20,18 @@ export class OrdersController {
     private readonly customerSession: CustomerSessionService,
     private readonly cart: CartService,
   ) {}
+
+  @Post('landing-page')
+  @Throttle({ default: { limit: 10, ttl: 60_000 } })
+  @ApiOperation({ summary: 'Place an order from a landing page' })
+  @ApiResponse({ status: 201, description: 'Order created' })
+  @ApiResponse({ status: 400, description: 'Invalid phone or missing fields' })
+  async createLandingPage(@Body() dto: CreateLandingPageOrderDto) {
+    if (this.honeypotFieldWasFilled(dto)) {
+      return { ok: true };
+    }
+    return this.orders.createLandingPageOrder(dto);
+  }
 
   @Post()
   @Throttle({ default: { limit: 10, ttl: 60_000 } })
@@ -36,7 +49,7 @@ export class OrdersController {
     return order;
   }
 
-  private honeypotFieldWasFilled(dto: CreateOrderDto): boolean {
+  private honeypotFieldWasFilled(dto: { company?: string }): boolean {
     return Boolean(dto.company && dto.company.trim() !== '');
   }
 

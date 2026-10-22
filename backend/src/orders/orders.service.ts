@@ -4,6 +4,7 @@ import { PrismaService } from '../prisma/prisma.service.js';
 import type { Product } from '../generated/prisma/client.js';
 import { applyDiscount } from '../promotions/promotion-price.util.js';
 import { PromotionsService } from '../promotions/promotions.service.js';
+import { CreateLandingPageOrderDto } from './dto/create-landing-page-order.dto.js';
 import { CreateOrderDto } from './dto/create-order.dto.js';
 import { ListOrdersQueryDto } from './dto/list-orders.query.dto.js';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto.js';
@@ -68,6 +69,36 @@ export class OrdersService {
               quantity: item.quantity,
             };
           }),
+        },
+      },
+      include: ORDER_INCLUDE,
+    });
+  }
+
+  async createLandingPageOrder(dto: CreateLandingPageOrderDto) {
+    if (!isValidBangladeshiPhone(dto.phone)) {
+      throw new BadRequestException('সঠিক বাংলাদেশী মোবাইল নম্বর দিন (যেমন: 01712345678)');
+    }
+
+    const total = dto.unitPrice * dto.quantity + dto.deliveryCharge;
+
+    return this.prisma.order.create({
+      data: {
+        customerName: dto.customerName.trim(),
+        phone: normalizePhone(dto.phone),
+        address: dto.address.trim(),
+        notes: dto.notes?.trim() ?? '',
+        deliveryZone: dto.deliveryZone,
+        deliveryCharge: dto.deliveryCharge,
+        total,
+        items: {
+          create: [
+            {
+              productName: dto.productName.trim(),
+              unitPrice: dto.unitPrice,
+              quantity: dto.quantity,
+            },
+          ],
         },
       },
       include: ORDER_INCLUDE,

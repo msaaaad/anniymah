@@ -2,11 +2,10 @@ import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import Script from "next/script";
 import { Toaster } from "sonner";
+import { CartProvider } from "@/context/CartContext";
+import { CartDrawer } from "@/components/storefront/CartDrawer";
 import "./globals.css";
 
-// No NEXT_PUBLIC_ prefix needed — this file is a Server Component, so
-// process.env is read on the server at render time and the value is baked
-// straight into the returned HTML, not inlined into a client bundle.
 const META_PIXEL_ID = process.env.META_PIXEL_ID;
 
 const fraunces = Fraunces({
@@ -23,11 +22,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Anniymah",
-  description: "৪-ইন-১ পারফিউম কম্বো — ঢাকার ভেতরে ফ্রি ডেলিভারি, ক্যাশ অন ডেলিভারি।",
+  title: "Anniymah | Premium Lifestyle & Fragrances",
+  description: "Authentic fragrances and lifestyle goods. Cash on delivery across Bangladesh.",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="bn" className={`${fraunces.variable} ${inter.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-bg text-text">
@@ -48,7 +47,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               `}
             </Script>
             <noscript>
-              {/* eslint-disable-next-line @next/next/no-img-element -- Meta Pixel's own noscript fallback, must be a plain img tag */}
               <img
                 height={1}
                 width={1}
@@ -59,7 +57,10 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             </noscript>
           </>
         )}
-        {children}
+        <CartProvider>
+          {children}
+          <CartDrawer />
+        </CartProvider>
         <Toaster
           position="top-right"
           offset={{ top: 84 }}
